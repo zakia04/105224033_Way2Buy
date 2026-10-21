@@ -5,8 +5,12 @@ export function SiteFooter() {
     <footer className="site-footer">
       <div className="site-footer__inner">
         <Link className="brand" href="/">
-          <span aria-hidden="true" className="brand__mark">w.</span>
-          <span className="brand__name">way2buy<span className="brand__dot">.</span></span>
+          <span aria-hidden="true" className="brand__mark">
+            w.
+          </span>
+          <span className="brand__name">
+            way2buy<span className="brand__dot">.</span>
+          </span>
         </Link>
         <p>Produk lokal, lebih dekat ke kamu.</p>
         <div>

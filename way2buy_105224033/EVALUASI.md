@@ -6,15 +6,15 @@ Dokumen ini mendokumentasikan lingkungan eksekusi pengujian, skenario uji otomat
 
 ## 1. Lingkungan Pengujian
 
-| Parameter | Spesifikasi |
-|---|---|
-| **Runtime** | Node.js v20+ / Node.js LTS |
-| **Framework Pengujian** | `node:test` (bawaan Node.js) dan `assert/strict` |
-| **TypeScript Loader** | `tsx` (`npx tsx --test tests/crypto.test.ts`) |
-| **File Pengujian** | [`tests/crypto.test.ts`](./tests/crypto.test.ts) |
-| **Perintah Pengujian** | `npm test` |
-| **Kunci Pengujian** | Kunci sintetis 256-bit dibangkitkan dinamis saat runtime (`crypto.randomBytes(32)`) |
-| **Data Uji** | Data alamat sintetis nusantara (bukan data pribadi nyata) |
+| Parameter               | Spesifikasi                                                                         |
+| ----------------------- | ----------------------------------------------------------------------------------- |
+| **Runtime**             | Node.js v20+ / Node.js LTS                                                          |
+| **Framework Pengujian** | `node:test` (bawaan Node.js) dan `assert/strict`                                    |
+| **TypeScript Loader**   | `tsx` (`npx tsx --test tests/crypto.test.ts`)                                       |
+| **File Pengujian**      | [`tests/crypto.test.ts`](./tests/crypto.test.ts)                                    |
+| **Perintah Pengujian**  | `npm test`                                                                          |
+| **Kunci Pengujian**     | Kunci sintetis 256-bit dibangkitkan dinamis saat runtime (`crypto.randomBytes(32)`) |
+| **Data Uji**            | Data alamat sintetis nusantara (bukan data pribadi nyata)                           |
 
 ---
 
@@ -71,16 +71,16 @@ Dokumen ini mendokumentasikan lingkungan eksekusi pengujian, skenario uji otomat
 
 ## 3. Matriks Skenario Pengujian Rinci
 
-| No | Skenario | Jenis | Masukan | Hasil Diharapkan | Hasil Aktual | Status |
-|:--:|:---|:---:|:---|:---|:---|:---:|
-| **1** | Enkripsi alamat valid | **Positif** | Alamat sintetis (string 81 char) | Ciphertext ≠ Plaintext, IV = 12 byte, AuthTag = 16 byte (Base64) | Seluruh properti terbentuk lengkap dan terenkripsi | ✅ **Lulus** |
-| **2** | Dekripsi ciphertext valid | **Positif** | Ciphertext valid & string Unicode aksen daerah | Plaintext identik dengan aslinya | Berhasil didekripsi tanpa korupsi karakter | ✅ **Lulus** |
-| **3** | Input kosong ditolak | **Negatif** | `""` dan `"   "` | Error: *"tidak boleh kosong"* | Validasi melempar error sesuai ekspektasi | ✅ **Lulus** |
-| **4** | Input non-string ditolak | **Negatif** | `12345`, `null`, `undefined` | Error: *"harus berupa string"* | Validasi melempar error pada setiap tipe invalid | ✅ **Lulus** |
-| **5** | Uji batas panjang | **Batas** | String 501 char & 500 char | 501 ditolak, 500 diterima | Tepat 500 berhasil; 501 ditolak | ✅ **Lulus** |
-| **6** | Ciphertext dimodifikasi | **Integritas** | Ciphertext valid di-flip 1 bit | OpenSSL GCM melempar auth failure | Dekripsi digagalkan secara otomatis | ✅ **Lulus** |
-| **7** | Auth tag palsu | **Integritas** | Auth tag diganti string acak | OpenSSL GCM melempar auth failure | Dekripsi digagalkan secara otomatis | ✅ **Lulus** |
-| **8** | Keacakan IV (CSPRNG) | **Keacakan** | Plaintext sama dienkripsi 2 kali | IV unik, ciphertext unik, dekripsi cocok | Terbukti menggunakan IV acak baru setiap saat | ✅ **Lulus** |
+|  No   | Skenario                  |     Jenis      | Masukan                                        | Hasil Diharapkan                                                 | Hasil Aktual                                       |    Status    |
+| :---: | :------------------------ | :------------: | :--------------------------------------------- | :--------------------------------------------------------------- | :------------------------------------------------- | :----------: |
+| **1** | Enkripsi alamat valid     |  **Positif**   | Alamat sintetis (string 81 char)               | Ciphertext ≠ Plaintext, IV = 12 byte, AuthTag = 16 byte (Base64) | Seluruh properti terbentuk lengkap dan terenkripsi | ✅ **Lulus** |
+| **2** | Dekripsi ciphertext valid |  **Positif**   | Ciphertext valid & string Unicode aksen daerah | Plaintext identik dengan aslinya                                 | Berhasil didekripsi tanpa korupsi karakter         | ✅ **Lulus** |
+| **3** | Input kosong ditolak      |  **Negatif**   | `""` dan `"   "`                               | Error: _"tidak boleh kosong"_                                    | Validasi melempar error sesuai ekspektasi          | ✅ **Lulus** |
+| **4** | Input non-string ditolak  |  **Negatif**   | `12345`, `null`, `undefined`                   | Error: _"harus berupa string"_                                   | Validasi melempar error pada setiap tipe invalid   | ✅ **Lulus** |
+| **5** | Uji batas panjang         |   **Batas**    | String 501 char & 500 char                     | 501 ditolak, 500 diterima                                        | Tepat 500 berhasil; 501 ditolak                    | ✅ **Lulus** |
+| **6** | Ciphertext dimodifikasi   | **Integritas** | Ciphertext valid di-flip 1 bit                 | OpenSSL GCM melempar auth failure                                | Dekripsi digagalkan secara otomatis                | ✅ **Lulus** |
+| **7** | Auth tag palsu            | **Integritas** | Auth tag diganti string acak                   | OpenSSL GCM melempar auth failure                                | Dekripsi digagalkan secara otomatis                | ✅ **Lulus** |
+| **8** | Keacakan IV (CSPRNG)      |  **Keacakan**  | Plaintext sama dienkripsi 2 kali               | IV unik, ciphertext unik, dekripsi cocok                         | Terbukti menggunakan IV acak baru setiap saat      | ✅ **Lulus** |
 
 ---
 

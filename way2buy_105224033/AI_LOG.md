@@ -9,6 +9,7 @@ Dokumen ini mencatat secara transparan seluruh penggunaan asisten kecerdasan bua
 **Alat AI**: Google Antigravity (Gemini 3.8 Flash / Claude Opus Thinking) |
 
 Setiap hasil yang disarankan oleh AI diperiksa dan divalidasi dengan kriteria berikut:
+
 1. **Keamanan Tanpa Secret:** Memeriksa bahwa tidak ada kunci privat, token produksi, password, atau credential yang ditulis langsung ke dalam source code.
 2. **Kesesuaian Aset:** Memastikan bahwa pemetaan aset (D-05, D-06, D-01) konsisten 100% dengan dokumen inventarisasi pada direktori `security/`.
 3. **Pustaka Terpelihara:** Menolak penggunaan sandi klasik (seperti Caesar/Vigenere/XOR) dan memastikan modul resmi `node:crypto` yang digunakan.

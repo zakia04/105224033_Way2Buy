@@ -11,10 +11,11 @@ Dokumen ini memuat catatan keputusan arsitektur (Architecture Decision Record / 
 AES-256-GCM dipilih sebagai algoritma simetris utama untuk melindungi data alamat pengiriman konsumen (Aset D-05).
 
 ### Alasan Pemilihan:
+
 1. **Authenticated Encryption with Associated Data (AEAD):**
    AES-GCM menyediakan dua jaminan keamanan sekaligus dalam satu operasi:
    - **Kerahasiaan (Confidentiality):** Mengubah data alamat sensitif menjadi ciphertext yang tidak dapat dibaca oleh pihak tanpa kunci.
-   - **Integritas dan Autentikasi (Integrity & Authenticity):** Menghasilkan *Authentication Tag* (128 bit) yang memastikan bahwa ciphertext tidak diubah atau dirusak oleh penyerang saat disimpan atau ditransmisikan.
+   - **Integritas dan Autentikasi (Integrity & Authenticity):** Menghasilkan _Authentication Tag_ (128 bit) yang memastikan bahwa ciphertext tidak diubah atau dirusak oleh penyerang saat disimpan atau ditransmisikan.
 2. **Kinerja Tinggi:**
    Mode GCM dapat diparalelkan dan didukung oleh instruksi perangkat keras prosesor modern (AES-NI), sehingga memiliki latensi enkripsi/dekripsi yang sangat rendah (< 2 ms).
 3. **Standar Global:**
@@ -22,12 +23,12 @@ AES-256-GCM dipilih sebagai algoritma simetris utama untuk melindungi data alama
 
 ### Perbandingan Alternatif yang Dipertimbangkan:
 
-| Algoritma / Mode | Kerahasiaan | Integritas Bawaan | Alasan Ditolak / Tidak Dipilih |
-|---|:---:|:---:|---|
-| **Sandi Klasik** (Caesar, Vigenère, Playfair) | ❌ Tidak Memadai | ❌ Tidak Ada | **Ditolak keras sesuai ketentuan tugas.** Tidak tahan terhadap analisis frekuensi dan mudah dipecahkan dalam hitungan detik. |
-| **AES-256-CBC** | ✅ Ya | ❌ Tidak | Tidak menyediakan autentikasi data. Rentan terhadap *Padding Oracle Attack* kecuali dipadukan dengan HMAC manual (meningkatkan kompleksitas implementasi). |
-| **ChaCha20-Poly1305** | ✅ Ya | ✅ Ya | Bagus untuk perangkat mobile tanpa AES-NI, namun AES-256 didukung secara native lebih optimal pada server backend Node.js. |
-| **RSA-2048 / RSA-4096** | ✅ Ya | ✅ Ya (Signature) | Enkripsi asimetris tidak efisien untuk enkripsi data langsung (lambat dan memiliki batas panjang data sesuai ukuran kunci). |
+| Algoritma / Mode                              |   Kerahasiaan    | Integritas Bawaan | Alasan Ditolak / Tidak Dipilih                                                                                                                             |
+| --------------------------------------------- | :--------------: | :---------------: | ---------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Sandi Klasik** (Caesar, Vigenère, Playfair) | ❌ Tidak Memadai |   ❌ Tidak Ada    | **Ditolak keras sesuai ketentuan tugas.** Tidak tahan terhadap analisis frekuensi dan mudah dipecahkan dalam hitungan detik.                               |
+| **AES-256-CBC**                               |      ✅ Ya       |     ❌ Tidak      | Tidak menyediakan autentikasi data. Rentan terhadap _Padding Oracle Attack_ kecuali dipadukan dengan HMAC manual (meningkatkan kompleksitas implementasi). |
+| **ChaCha20-Poly1305**                         |      ✅ Ya       |       ✅ Ya       | Bagus untuk perangkat mobile tanpa AES-NI, namun AES-256 didukung secara native lebih optimal pada server backend Node.js.                                 |
+| **RSA-2048 / RSA-4096**                       |      ✅ Ya       | ✅ Ya (Signature) | Enkripsi asimetris tidak efisien untuk enkripsi data langsung (lambat dan memiliki batas panjang data sesuai ukuran kunci).                                |
 
 ---
 
@@ -46,7 +47,7 @@ AES-256-GCM dipilih sebagai algoritma simetris utama untuk melindungi data alama
 
 - **Rekomendasi NIST SP 800-38D:** NIST merekomendasikan panjang IV tepat 96-bit untuk GCM.
 - Jika panjang IV bukan 96 bit, algoritma harus menjalankan fungsi GHASH tambahan untuk menghitung IV efektif, yang menambah overhead dan meningkatkan risiko implementasi.
-- **Keunikan:** IV dibangkitkan menggunakan CSPRNG sistem operasi (`crypto.randomBytes(12)`). IV tidak pernah digunakan ulang dengan kunci yang sama (*nonce*).
+- **Keunikan:** IV dibangkitkan menggunakan CSPRNG sistem operasi (`crypto.randomBytes(12)`). IV tidak pernah digunakan ulang dengan kunci yang sama (_nonce_).
 
 ---
 
@@ -76,4 +77,4 @@ AES-256-GCM dipilih sebagai algoritma simetris utama untuk melindungi data alama
 
 - Masukan harus bertipe `string`.
 - Masukan tidak boleh string kosong atau hanya spasi.
-- Panjang maksimum dibatasi hingga 500 karakter untuk mencegah konsumsi memori berlebih (*Denial of Service* / DoS).
+- Panjang maksimum dibatasi hingga 500 karakter untuk mencegah konsumsi memori berlebih (_Denial of Service_ / DoS).

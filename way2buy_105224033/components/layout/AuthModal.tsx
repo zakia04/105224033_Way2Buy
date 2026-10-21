@@ -3,14 +3,12 @@
 import { useState, useEffect, FormEvent } from "react";
 
 interface AuthModalProps {
-  isOpen: boolean;
   onClose: () => void;
   onLoginSuccess: (user: { name: string; email: string; role: string }) => void;
   initialMode?: "daftar" | "masuk";
 }
 
 export function AuthModal({
-  isOpen,
   onClose,
   onLoginSuccess,
   initialMode = "daftar",
@@ -35,26 +33,13 @@ export function AuthModal({
   // Keyboard Escape listener
   useEffect(() => {
     function handleKeyDown(e: KeyboardEvent) {
-      if (e.key === "Escape" && isOpen) {
+      if (e.key === "Escape") {
         onClose();
       }
     }
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [isOpen, onClose]);
-
-  // Reset state when modal opens
-  useEffect(() => {
-    if (isOpen) {
-      setMode(initialMode);
-      setRegErrors({});
-      setLoginError(null);
-      setSuccessMessage(null);
-      setIsLoading(false);
-    }
-  }, [isOpen, initialMode]);
-
-  if (!isOpen) return null;
+  }, [onClose]);
 
   function handleRegisterSubmit(e: FormEvent) {
     e.preventDefault();
@@ -79,7 +64,9 @@ export function AuthModal({
     setIsLoading(true);
     setTimeout(() => {
       setIsLoading(false);
-      setSuccessMessage(`Akun berhasil dibuat! Selamat datang di Way2Buy, ${regName}.`);
+      setSuccessMessage(
+        `Akun berhasil dibuat! Selamat datang di Way2Buy, ${regName}.`,
+      );
       setTimeout(() => {
         onLoginSuccess({
           name: regName,
@@ -95,7 +82,10 @@ export function AuthModal({
     e.preventDefault();
     setLoginError(null);
 
-    if (!loginEmail.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(loginEmail.trim())) {
+    if (
+      !loginEmail.trim() ||
+      !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(loginEmail.trim())
+    ) {
       setLoginError("Masukkan alamat email yang valid.");
       return;
     }
@@ -108,7 +98,9 @@ export function AuthModal({
     setTimeout(() => {
       setIsLoading(false);
       const displayName = loginEmail.split("@")[0];
-      setSuccessMessage(`Berhasil masuk! Selamat datang kembali, ${displayName}.`);
+      setSuccessMessage(
+        `Berhasil masuk! Selamat datang kembali, ${displayName}.`,
+      );
       setTimeout(() => {
         onLoginSuccess({
           name: displayName,
@@ -122,14 +114,14 @@ export function AuthModal({
 
   // Palet Warna Brand Way2Buy
   const THEME = {
-    green: "#285a49",       // Primary Brand Green
-    greenDark: "#1d4538",   // Darker Green Hover
-    ink: "#203a35",         // Dark Text
-    inkSoft: "#536b64",     // Muted Text
-    coral: "#e98467",       // Brand Coral Accent
-    coralDark: "#d97155",   // Coral Hover
-    line: "#e6e5da",        // Border Line
-    paper: "#faf9f4",       // Warm Paper Background
+    green: "#285a49", // Primary Brand Green
+    greenDark: "#1d4538", // Darker Green Hover
+    ink: "#203a35", // Dark Text
+    inkSoft: "#536b64", // Muted Text
+    coral: "#e98467", // Brand Coral Accent
+    coralDark: "#d97155", // Coral Hover
+    line: "#e6e5da", // Border Line
+    paper: "#faf9f4", // Warm Paper Background
   };
 
   return (
@@ -223,7 +215,14 @@ export function AuthModal({
             >
               ✓
             </span>
-            <p style={{ margin: 0, fontWeight: 700, fontSize: "1.1rem", color: THEME.ink }}>
+            <p
+              style={{
+                margin: 0,
+                fontWeight: 700,
+                fontSize: "1.1rem",
+                color: THEME.ink,
+              }}
+            >
               {successMessage}
             </p>
           </div>
@@ -310,25 +309,38 @@ export function AuthModal({
                     width: "100%",
                     padding: "11px 14px",
                     borderRadius: "8px",
-                    border: regErrors.name ? "1px solid #ef4444" : `1px solid ${THEME.line}`,
+                    border: regErrors.name
+                      ? "1px solid #ef4444"
+                      : `1px solid ${THEME.line}`,
                     backgroundColor: "#ffffff",
                     color: THEME.ink,
                     fontSize: "14.5px",
                     boxSizing: "border-box",
                     outline: "none",
-                    transition: "border-color 150ms ease, box-shadow 150ms ease",
+                    transition:
+                      "border-color 150ms ease, box-shadow 150ms ease",
                   }}
                   onFocus={(e) => {
                     e.currentTarget.style.borderColor = THEME.green;
-                    e.currentTarget.style.boxShadow = "0 0 0 3px rgba(40, 90, 73, 0.15)";
+                    e.currentTarget.style.boxShadow =
+                      "0 0 0 3px rgba(40, 90, 73, 0.15)";
                   }}
                   onBlur={(e) => {
-                    e.currentTarget.style.borderColor = regErrors.name ? "#ef4444" : THEME.line;
+                    e.currentTarget.style.borderColor = regErrors.name
+                      ? "#ef4444"
+                      : THEME.line;
                     e.currentTarget.style.boxShadow = "none";
                   }}
                 />
                 {regErrors.name && (
-                  <p style={{ color: "#ef4444", fontSize: "12px", margin: "4px 0 0", fontWeight: 500 }}>
+                  <p
+                    style={{
+                      color: "#ef4444",
+                      fontSize: "12px",
+                      margin: "4px 0 0",
+                      fontWeight: 500,
+                    }}
+                  >
                     {regErrors.name}
                   </p>
                 )}
@@ -360,25 +372,38 @@ export function AuthModal({
                     width: "100%",
                     padding: "11px 14px",
                     borderRadius: "8px",
-                    border: regErrors.email ? "1px solid #ef4444" : `1px solid ${THEME.line}`,
+                    border: regErrors.email
+                      ? "1px solid #ef4444"
+                      : `1px solid ${THEME.line}`,
                     backgroundColor: "#ffffff",
                     color: THEME.ink,
                     fontSize: "14.5px",
                     boxSizing: "border-box",
                     outline: "none",
-                    transition: "border-color 150ms ease, box-shadow 150ms ease",
+                    transition:
+                      "border-color 150ms ease, box-shadow 150ms ease",
                   }}
                   onFocus={(e) => {
                     e.currentTarget.style.borderColor = THEME.green;
-                    e.currentTarget.style.boxShadow = "0 0 0 3px rgba(40, 90, 73, 0.15)";
+                    e.currentTarget.style.boxShadow =
+                      "0 0 0 3px rgba(40, 90, 73, 0.15)";
                   }}
                   onBlur={(e) => {
-                    e.currentTarget.style.borderColor = regErrors.email ? "#ef4444" : THEME.line;
+                    e.currentTarget.style.borderColor = regErrors.email
+                      ? "#ef4444"
+                      : THEME.line;
                     e.currentTarget.style.boxShadow = "none";
                   }}
                 />
                 {regErrors.email && (
-                  <p style={{ color: "#ef4444", fontSize: "12px", margin: "4px 0 0", fontWeight: 500 }}>
+                  <p
+                    style={{
+                      color: "#ef4444",
+                      fontSize: "12px",
+                      margin: "4px 0 0",
+                      fontWeight: 500,
+                    }}
+                  >
                     {regErrors.email}
                   </p>
                 )}
@@ -410,25 +435,38 @@ export function AuthModal({
                     width: "100%",
                     padding: "11px 14px",
                     borderRadius: "8px",
-                    border: regErrors.password ? "1px solid #ef4444" : `1px solid ${THEME.line}`,
+                    border: regErrors.password
+                      ? "1px solid #ef4444"
+                      : `1px solid ${THEME.line}`,
                     backgroundColor: "#ffffff",
                     color: THEME.ink,
                     fontSize: "14.5px",
                     boxSizing: "border-box",
                     outline: "none",
-                    transition: "border-color 150ms ease, box-shadow 150ms ease",
+                    transition:
+                      "border-color 150ms ease, box-shadow 150ms ease",
                   }}
                   onFocus={(e) => {
                     e.currentTarget.style.borderColor = THEME.green;
-                    e.currentTarget.style.boxShadow = "0 0 0 3px rgba(40, 90, 73, 0.15)";
+                    e.currentTarget.style.boxShadow =
+                      "0 0 0 3px rgba(40, 90, 73, 0.15)";
                   }}
                   onBlur={(e) => {
-                    e.currentTarget.style.borderColor = regErrors.password ? "#ef4444" : THEME.line;
+                    e.currentTarget.style.borderColor = regErrors.password
+                      ? "#ef4444"
+                      : THEME.line;
                     e.currentTarget.style.boxShadow = "none";
                   }}
                 />
                 {regErrors.password && (
-                  <p style={{ color: "#ef4444", fontSize: "12px", margin: "4px 0 0", fontWeight: 500 }}>
+                  <p
+                    style={{
+                      color: "#ef4444",
+                      fontSize: "12px",
+                      margin: "4px 0 0",
+                      fontWeight: 500,
+                    }}
+                  >
                     {regErrors.password}
                   </p>
                 )}
@@ -460,25 +498,37 @@ export function AuthModal({
                     width: "100%",
                     padding: "11px 14px",
                     borderRadius: "8px",
-                    border: regErrors.confirmPassword ? "1px solid #ef4444" : `1px solid ${THEME.line}`,
+                    border: regErrors.confirmPassword
+                      ? "1px solid #ef4444"
+                      : `1px solid ${THEME.line}`,
                     backgroundColor: "#ffffff",
                     color: THEME.ink,
                     fontSize: "14.5px",
                     boxSizing: "border-box",
                     outline: "none",
-                    transition: "border-color 150ms ease, box-shadow 150ms ease",
+                    transition:
+                      "border-color 150ms ease, box-shadow 150ms ease",
                   }}
                   onFocus={(e) => {
                     e.currentTarget.style.borderColor = THEME.green;
-                    e.currentTarget.style.boxShadow = "0 0 0 3px rgba(40, 90, 73, 0.15)";
+                    e.currentTarget.style.boxShadow =
+                      "0 0 0 3px rgba(40, 90, 73, 0.15)";
                   }}
                   onBlur={(e) => {
-                    e.currentTarget.style.borderColor = regErrors.confirmPassword ? "#ef4444" : THEME.line;
+                    e.currentTarget.style.borderColor =
+                      regErrors.confirmPassword ? "#ef4444" : THEME.line;
                     e.currentTarget.style.boxShadow = "none";
                   }}
                 />
                 {regErrors.confirmPassword && (
-                  <p style={{ color: "#ef4444", fontSize: "12px", margin: "4px 0 0", fontWeight: 500 }}>
+                  <p
+                    style={{
+                      color: "#ef4444",
+                      fontSize: "12px",
+                      margin: "4px 0 0",
+                      fontWeight: 500,
+                    }}
+                  >
                     {regErrors.confirmPassword}
                   </p>
                 )}
@@ -628,11 +678,13 @@ export function AuthModal({
                     fontSize: "14.5px",
                     boxSizing: "border-box",
                     outline: "none",
-                    transition: "border-color 150ms ease, box-shadow 150ms ease",
+                    transition:
+                      "border-color 150ms ease, box-shadow 150ms ease",
                   }}
                   onFocus={(e) => {
                     e.currentTarget.style.borderColor = THEME.green;
-                    e.currentTarget.style.boxShadow = "0 0 0 3px rgba(40, 90, 73, 0.15)";
+                    e.currentTarget.style.boxShadow =
+                      "0 0 0 3px rgba(40, 90, 73, 0.15)";
                   }}
                   onBlur={(e) => {
                     e.currentTarget.style.borderColor = THEME.line;
@@ -673,11 +725,13 @@ export function AuthModal({
                     fontSize: "14.5px",
                     boxSizing: "border-box",
                     outline: "none",
-                    transition: "border-color 150ms ease, box-shadow 150ms ease",
+                    transition:
+                      "border-color 150ms ease, box-shadow 150ms ease",
                   }}
                   onFocus={(e) => {
                     e.currentTarget.style.borderColor = THEME.green;
-                    e.currentTarget.style.boxShadow = "0 0 0 3px rgba(40, 90, 73, 0.15)";
+                    e.currentTarget.style.boxShadow =
+                      "0 0 0 3px rgba(40, 90, 73, 0.15)";
                   }}
                   onBlur={(e) => {
                     e.currentTarget.style.borderColor = THEME.line;
