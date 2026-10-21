@@ -34,8 +34,10 @@ export async function POST(request: NextRequest) {
       const { data } = body as { data: EncryptedData };
       if (!data?.ciphertext) {
         return NextResponse.json(
-          { error: "Data ciphertext tidak ditemukan untuk simulasi tampering." },
-          { status: 400 }
+          {
+            error: "Data ciphertext tidak ditemukan untuk simulasi tampering.",
+          },
+          { status: 400 },
         );
       }
 
@@ -53,10 +55,12 @@ export async function POST(request: NextRequest) {
         // Seharusnya tidak pernah sampai sini jika GCM bekerja
         return NextResponse.json({
           tamperDetected: false,
-          message: "Peringatan: Verifikasi integritas tidak mendeteksi perubahan.",
+          message:
+            "Peringatan: Verifikasi integritas tidak mendeteksi perubahan.",
         });
       } catch (err: unknown) {
-        const errorMsg = err instanceof Error ? err.message : "Authentication failed";
+        const errorMsg =
+          err instanceof Error ? err.message : "Authentication failed";
         return NextResponse.json({
           tamperDetected: true,
           tamperedCiphertext: tamperedData.ciphertext,
@@ -68,11 +72,17 @@ export async function POST(request: NextRequest) {
     }
 
     return NextResponse.json(
-      { error: "Aksi tidak valid. Gunakan 'encrypt', 'decrypt', atau 'simulate_tamper'." },
-      { status: 400 }
+      {
+        error:
+          "Aksi tidak valid. Gunakan 'encrypt', 'decrypt', atau 'simulate_tamper'.",
+      },
+      { status: 400 },
     );
   } catch (err: unknown) {
-    const message = err instanceof Error ? err.message : "Terjadi kesalahan pada modul kriptografi";
+    const message =
+      err instanceof Error
+        ? err.message
+        : "Terjadi kesalahan pada modul kriptografi";
     return NextResponse.json({ error: message }, { status: 400 });
   }
 }

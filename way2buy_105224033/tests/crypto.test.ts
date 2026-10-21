@@ -19,9 +19,6 @@ import { randomBytes } from "node:crypto";
 import {
   encryptAddress,
   decryptAddress,
-  validateAddress,
-  getEncryptionKey,
-  CRYPTO_CONFIG,
   type EncryptedData,
 } from "../lib/crypto";
 
@@ -56,7 +53,7 @@ describe("Skenario 1 — Enkripsi alamat valid", () => {
     assert.notEqual(
       hasil.ciphertext,
       ALAMAT_SINTETIS,
-      "ciphertext harus berbeda dari plaintext"
+      "ciphertext harus berbeda dari plaintext",
     );
 
     // 4. Periksa panjang IV tepat 12 byte (NIST SP 800-38D)
@@ -65,7 +62,11 @@ describe("Skenario 1 — Enkripsi alamat valid", () => {
 
     // 5. Periksa panjang auth tag tepat 16 byte
     const authTagBuffer = Buffer.from(hasil.authTag, "base64");
-    assert.equal(authTagBuffer.length, 16, "Auth tag harus tepat sepanjang 16 byte");
+    assert.equal(
+      authTagBuffer.length,
+      16,
+      "Auth tag harus tepat sepanjang 16 byte",
+    );
   });
 });
 
@@ -80,12 +81,13 @@ describe("Skenario 2 — Dekripsi ciphertext valid", () => {
     assert.equal(
       decrypted,
       ALAMAT_SINTETIS,
-      "Hasil dekripsi harus sama persis dengan alamat awal"
+      "Hasil dekripsi harus sama persis dengan alamat awal",
     );
   });
 
   it("harus berhasil untuk alamat dengan karakter Unicode / aksen nusantara", () => {
-    const alamatUnicode = "Jl. Merdeka No. 45, Kota Tëst — Spesial (Ünïcödë & Café)";
+    const alamatUnicode =
+      "Jl. Merdeka No. 45, Kota Tëst — Spesial (Ünïcödë & Café)";
     const encrypted = encryptAddress(alamatUnicode, TEST_KEY);
     const decrypted = decryptAddress(encrypted, TEST_KEY);
 
@@ -101,7 +103,7 @@ describe("Skenario 3 — Input kosong ditolak", () => {
     assert.throws(
       () => encryptAddress("", TEST_KEY),
       { message: /tidak boleh kosong/ },
-      "String kosong harus ditolak"
+      "String kosong harus ditolak",
     );
   });
 
@@ -109,7 +111,7 @@ describe("Skenario 3 — Input kosong ditolak", () => {
     assert.throws(
       () => encryptAddress("   ", TEST_KEY),
       { message: /tidak boleh kosong/ },
-      "String spasi saja harus ditolak"
+      "String spasi saja harus ditolak",
     );
   });
 });
@@ -119,23 +121,21 @@ describe("Skenario 3 — Input kosong ditolak", () => {
 // ─────────────────────────────────────────────
 describe("Skenario 4 — Input bukan string ditolak", () => {
   it("harus melempar error untuk input bertipe number", () => {
-    assert.throws(
-      () => encryptAddress(12345 as unknown as string, TEST_KEY),
-      { message: /harus berupa string/ }
-    );
+    assert.throws(() => encryptAddress(12345 as unknown as string, TEST_KEY), {
+      message: /harus berupa string/,
+    });
   });
 
   it("harus melempar error untuk input null", () => {
-    assert.throws(
-      () => encryptAddress(null as unknown as string, TEST_KEY),
-      { message: /harus berupa string/ }
-    );
+    assert.throws(() => encryptAddress(null as unknown as string, TEST_KEY), {
+      message: /harus berupa string/,
+    });
   });
 
   it("harus melempar error untuk input undefined", () => {
     assert.throws(
       () => encryptAddress(undefined as unknown as string, TEST_KEY),
-      { message: /harus berupa string/ }
+      { message: /harus berupa string/ },
     );
   });
 });
@@ -146,16 +146,18 @@ describe("Skenario 4 — Input bukan string ditolak", () => {
 describe("Skenario 5 — Alamat melebihi batas panjang", () => {
   it("harus melempar error untuk alamat lebih dari 500 karakter (501 karakter)", () => {
     const alamatPanjang = "A".repeat(501);
-    assert.throws(
-      () => encryptAddress(alamatPanjang, TEST_KEY),
-      { message: /melebihi batas maksimum/ }
-    );
+    assert.throws(() => encryptAddress(alamatPanjang, TEST_KEY), {
+      message: /melebihi batas maksimum/,
+    });
   });
 
   it("harus berhasil untuk alamat tepat batas maksimum 500 karakter", () => {
     const alamatBatas = "B".repeat(500);
     const hasil = encryptAddress(alamatBatas, TEST_KEY);
-    assert.ok(hasil.ciphertext, "Enkripsi harus berhasil pada batas tepat 500 karakter");
+    assert.ok(
+      hasil.ciphertext,
+      "Enkripsi harus berhasil pada batas tepat 500 karakter",
+    );
 
     const decrypted = decryptAddress(hasil, TEST_KEY);
     assert.equal(decrypted, alamatBatas);
@@ -180,7 +182,7 @@ describe("Skenario 6 — Ciphertext yang diubah ditolak", () => {
     assert.throws(
       () => decryptAddress(tamperedData, TEST_KEY),
       /Unsupported state|error|auth/i,
-      "Dekripsi harus gagal jika ciphertext diubah (integritas terverifikasi)"
+      "Dekripsi harus gagal jika ciphertext diubah (integritas terverifikasi)",
     );
   });
 });
@@ -202,7 +204,7 @@ describe("Skenario 7 — Authentication tag tidak sesuai", () => {
     assert.throws(
       () => decryptAddress(tamperedData, TEST_KEY),
       /Unsupported state|error|auth/i,
-      "Dekripsi harus gagal jika auth tag tidak sesuai"
+      "Dekripsi harus gagal jika auth tag tidak sesuai",
     );
   });
 });
@@ -219,14 +221,14 @@ describe("Skenario 8 — Dua enkripsi menghasilkan IV berbeda", () => {
     assert.notEqual(
       hasil1.iv,
       hasil2.iv,
-      "Setiap enkripsi harus menghasilkan IV unik yang berbeda"
+      "Setiap enkripsi harus menghasilkan IV unik yang berbeda",
     );
 
     // Ciphertext juga harus berbeda meski plaintext identik
     assert.notEqual(
       hasil1.ciphertext,
       hasil2.ciphertext,
-      "Ciphertext harus berbeda untuk IV yang berbeda"
+      "Ciphertext harus berbeda untuk IV yang berbeda",
     );
 
     // Keduanya harus berhasil didekripsi ke plaintext awal yang sama

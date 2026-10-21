@@ -1,16 +1,16 @@
 # Laporan Pengujian Aksesibilitas Web (Lighthouse Accessibility Report)
 
-Dokumen ini memuat bukti pengujian aksesibilitas (*web accessibility*) untuk platform **Way2Buy (Milestone 1)** sesuai dengan instruksi tugas pengembangan aplikasi web.
+Dokumen ini memuat bukti pengujian aksesibilitas (_web accessibility_) untuk platform **Way2Buy (Milestone 1)** sesuai dengan instruksi tugas pengembangan aplikasi web.
 
 ---
 
 ## 1. Ringkasan Skor Lighthouse
 
-| Halaman yang Diuji | URL | Skor Aksesibilitas (Lighthouse) | Status | Ketentuan Minimum |
-|---|---|:---:|:---:|:---:|
-| **Beranda (Home)** | `http://localhost:3000/` | **100 / 100** | ✅ **Memenuhi** | &ge; 85 |
-| **Katalog Produk** | `http://localhost:3000/produk` | **100 / 100** | ✅ **Memenuhi** | &ge; 85 |
-| **Formulir Permintaan Titip** | `http://localhost:3000/titip` | **100 / 100** | ✅ **Memenuhi** | &ge; 85 |
+| Halaman yang Diuji            | URL                            | Skor Aksesibilitas (Lighthouse) |     Status      | Ketentuan Minimum |
+| ----------------------------- | ------------------------------ | :-----------------------------: | :-------------: | :---------------: |
+| **Beranda (Home)**            | `http://localhost:3000/`       |          **100 / 100**          | ✅ **Memenuhi** |      &ge; 85      |
+| **Katalog Produk**            | `http://localhost:3000/produk` |          **100 / 100**          | ✅ **Memenuhi** |      &ge; 85      |
+| **Formulir Permintaan Titip** | `http://localhost:3000/titip`  |          **100 / 100**          | ✅ **Memenuhi** |      &ge; 85      |
 
 > **Kesimpulan:** Seluruh halaman pada Way2Buy memperoleh skor aksesibilitas **100**, melampaui batas minimum **85** yang disyaratkan dalam kriteria Milestone 1. Khusus pada halaman katalog produk, pengujian Lighthouse menunjukkan skor maksimal **100/100** dengan catatan tambahan untuk pengecekan manual.
 
@@ -42,13 +42,13 @@ Selain itu, halaman ini menunjukkan bahwa item yang ditandai menjadi perhatian p
 
 Pengujian dilakukan menggunakan Google Chrome DevTools Lighthouse audit dengan parameter kondisi sebagai berikut:
 
-- **Mode Pengujian:** *Navigation (Default)*
-- **Perangkat yang Diemulasikan (*Emulated Device*):**
+- **Mode Pengujian:** _Navigation (Default)_
+- **Perangkat yang Diemulasikan (_Emulated Device_):**
   - Desktop: Layar 1350 &times; 940 px, DPR 1.0
   - Mobile: Moto G Power / Pixel 7 (393 &times; 851 px), DPR 2.75
-- **Versi Peramban (*Browser*):** Google Chrome Versi 131.0.6778.86 (Official Build) 64-bit
+- **Versi Peramban (_Browser_):** Google Chrome Versi 131.0.6778.86 (Official Build) 64-bit
 - **Versi Lighthouse:** 12.2.1
-- **Kondisi Throttling Jaringan:** *Simulated Fast 4G, 4x CPU Slowdown*
+- **Kondisi Throttling Jaringan:** _Simulated Fast 4G, 4x CPU Slowdown_
 - **Lingkungan Eksekusi:** Localhost development server (`next dev`)
 
 ---
@@ -58,16 +58,18 @@ Pengujian dilakukan menggunakan Google Chrome DevTools Lighthouse audit dengan p
 Berikut adalah implementasi spesifik pada komponen antarmuka yang mendukung skor aksesibilitas tinggi:
 
 ### 4.1 Struktur HTML Semantik & Landmark
+
 - Dokumen menggunakan elemen root semantik: `<header className="site-header">`, `<nav aria-label="Navigasi utama">`, `<main id="main-content">`, `<section>`, `<article>`, dan `<footer className="site-footer">`.
-- Terdapat tautan pintas (*skip link*) di setiap halaman:
+- Terdapat tautan pintas (_skip link_) di setiap halaman:
   ```html
   <a className="skip-link" href="#main-content">Lewati ke konten utama</a>
   ```
-  yang memungkinkan pengguna papan ketik (*keyboard-only*) langsung melompat ke konten tanpa melewati navigasi.
+  yang memungkinkan pengguna papan ketik (_keyboard-only_) langsung melompat ke konten tanpa melewati navigasi.
 
 ### 4.2 Label Formulir & Hubungan Aksesibel
-- Seluruh elemen input, select, dan textarea pada formulir permintaan titip (`app/components/RequestForm.tsx`) memiliki elemen `<label>` berpasangan eksplisit menggunakan atribut `htmlFor` dan `id`.
-- Indikator wajib diisi (*required field*) ditandai dengan semantik jelas.
+
+- Seluruh elemen input, select, dan textarea pada formulir permintaan titip (`components/features/requests/RequestForm.tsx`) memiliki elemen `<label>` berpasangan eksplisit menggunakan atribut `htmlFor` dan `id`.
+- Indikator wajib diisi (_required field_) ditandai dengan semantik jelas.
 - Validasi kesalahan mengaitkan pesan error dengan kontrol input menggunakan atribut `aria-describedby` dan `aria-invalid`:
   ```tsx
   <input
@@ -81,16 +83,19 @@ Berikut adalah implementasi spesifik pada komponen antarmuka yang mendukung skor
   ```
 
 ### 4.3 Kontras Warna & Tipografi
+
 - Kontras rasio teks terhadap latar belakang memenuhi standar **WCAG 2.1 AA** (rasio minimal 4.5:1 untuk teks biasa):
   - Teks utama (`--ink: #203a35`) pada latar belakang (`--paper: #faf9f4` / `#ffffff`) menghasilkan kontras **11.2:1**.
   - Teks sekunder (`--ink-soft: #536b64`) menghasilkan kontras **5.1:1**.
   - Tombol CTA (`--green: #285a49` dengan teks putih) menghasilkan kontras **6.8:1**.
 
 ### 4.4 Navigasi Keyboard & Focus Indicator
-- Seluruh tautan dan elemen interaktif memiliki *focus indicator* yang tampak jelas (*visible focus ring*) saat dinavigasi menggunakan tombol `Tab`.
-- Komponen filter kategori dan tombol formulir dapat diakses dan dioperasikan sepenuhnya tanpa menggunakan tetikus (*mouse*).
+
+- Seluruh tautan dan elemen interaktif memiliki _focus indicator_ yang tampak jelas (_visible focus ring_) saat dinavigasi menggunakan tombol `Tab`.
+- Komponen filter kategori dan tombol formulir dapat diakses dan dioperasikan sepenuhnya tanpa menggunakan tetikus (_mouse_).
 
 ### 4.5 Aksesibilitas Gambar dan Ikon
+
 - Elemen dekoratif dan ikon visual dilengkapi dengan atribut `aria-hidden="true"`.
 - Setiap kartu produk memiliki teks alternatif dan nama aksesibel yang mendeskripsikan produk secara komprehensif.
 
@@ -99,6 +104,7 @@ Berikut adalah implementasi spesifik pada komponen antarmuka yang mendukung skor
 ## 5. Bukti Tangkapan Layar Pengujian
 
 Tangkapan layar pengujian antarmuka dan validasi tersimpan pada direktori [`evidence/`](./):
+
 1. **Desktop (≥ 1024 px):** [`evidence/beranda-desktop.png`](./beranda-desktop.png)
 2. **Tablet (768 px):** [`evidence/beranda-tablet.png`](./beranda-tablet.png)
 3. **Ponsel (≤ 640 px):** [`evidence/beranda-mobile.png`](./beranda-mobile.png)

@@ -5,7 +5,7 @@ import Link from "next/link";
 import { AuthModal } from "./AuthModal";
 
 interface SiteHeaderProps {
-  activePath: "/" | "/produk" | "/titip";
+  activePath: "/" | "/produk" | "/tentang" | "/titip";
 }
 
 interface UserSession {
@@ -17,6 +17,7 @@ interface UserSession {
 const navigation = [
   { href: "/", label: "Beranda", shortLabel: "Beranda" },
   { href: "/produk", label: "Jelajahi produk", shortLabel: "Produk" },
+  { href: "/tentang", label: "Tentang", shortLabel: "Tentang" },
   { href: "/titip", label: "Cara titip", shortLabel: "Titip" },
 ] as const;
 
@@ -29,8 +30,12 @@ export function SiteHeader({ activePath }: SiteHeaderProps) {
       <header className="site-header">
         <div className="site-header__inner">
           <Link className="brand" href="/">
-            <span aria-hidden="true" className="brand__mark">w.</span>
-            <span className="brand__name">way2buy<span className="brand__dot">.</span></span>
+            <span aria-hidden="true" className="brand__mark">
+              w.
+            </span>
+            <span className="brand__name">
+              way2buy<span className="brand__dot">.</span>
+            </span>
           </Link>
           <nav aria-label="Navigasi utama" className="site-nav">
             {navigation.map((item) => (
@@ -41,14 +46,19 @@ export function SiteHeader({ activePath }: SiteHeaderProps) {
                 key={item.href}
               >
                 <span className="site-nav__label--desktop">{item.label}</span>
-                <span className="site-nav__label--mobile">{item.shortLabel}</span>
+                <span className="site-nav__label--mobile">
+                  {item.shortLabel}
+                </span>
               </Link>
             ))}
           </nav>
           <div className="header-actions">
             {userSession ? (
               <div className="user-badge-group">
-                <span className="user-badge" title={`${userSession.name} (${userSession.role})`}>
+                <span
+                  className="user-badge"
+                  title={`${userSession.name} (${userSession.role})`}
+                >
                   👤 {userSession.name}
                 </span>
                 <button
@@ -97,11 +107,12 @@ export function SiteHeader({ activePath }: SiteHeaderProps) {
         </div>
       </header>
 
-      <AuthModal
-        isOpen={isAuthOpen}
-        onClose={() => setIsAuthOpen(false)}
-        onLoginSuccess={(user) => setUserSession(user)}
-      />
+      {isAuthOpen && (
+        <AuthModal
+          onClose={() => setIsAuthOpen(false)}
+          onLoginSuccess={(user) => setUserSession(user)}
+        />
+      )}
     </>
   );
 }

@@ -1,7 +1,7 @@
 "use client";
 
 import { FormEvent, useState } from "react";
-import { products } from "../data/products";
+import { products } from "../../../lib/catalog/products";
 
 interface FormValues {
   name: string;
@@ -55,7 +55,9 @@ export function RequestForm() {
   const [values, setValues] = useState<FormValues>(initialValues);
   const [errors, setErrors] = useState<FormErrors>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [orderResponse, setOrderResponse] = useState<OrderResponse | null>(null);
+  const [orderResponse, setOrderResponse] = useState<OrderResponse | null>(
+    null,
+  );
   const [showCryptoDetails, setShowCryptoDetails] = useState(false);
   const [decryptedAddress, setDecryptedAddress] = useState<string | null>(null);
   const [isDecrypting, setIsDecrypting] = useState(false);
@@ -75,23 +77,34 @@ export function RequestForm() {
     setDecryptedAddress(null);
 
     const nextErrors: FormErrors = {};
-    if (values.name.trim().length < 2) nextErrors.name = "Nama minimal terdiri dari 2 karakter.";
+    if (values.name.trim().length < 2)
+      nextErrors.name = "Nama minimal terdiri dari 2 karakter.";
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(values.email.trim())) {
-      nextErrors.email = "Masukkan alamat email yang valid, misalnya nama@email.com.";
+      nextErrors.email =
+        "Masukkan alamat email yang valid, misalnya nama@email.com.";
     }
     const phoneDigits = values.phone.replace(/\D/g, "");
-    if (!/^[0-9+()\-\s]+$/.test(values.phone.trim()) || phoneDigits.length < 9 || phoneDigits.length > 16) {
+    if (
+      !/^[0-9+()\-\s]+$/.test(values.phone.trim()) ||
+      phoneDigits.length < 9 ||
+      phoneDigits.length > 16
+    ) {
       nextErrors.phone = "Masukkan nomor WhatsApp yang valid (9–16 digit).";
     }
-    if (!values.product) nextErrors.product = "Pilih produk yang ingin dititipkan.";
-    if (!Number.isInteger(Number(values.quantity)) || Number(values.quantity) < 1) {
+    if (!values.product)
+      nextErrors.product = "Pilih produk yang ingin dititipkan.";
+    if (
+      !Number.isInteger(Number(values.quantity)) ||
+      Number(values.quantity) < 1
+    ) {
       nextErrors.quantity = "Jumlah minimal 1.";
     }
     if (values.destination.trim().length < 3) {
       nextErrors.destination = "Masukkan kota tujuan pengiriman.";
     }
     if (values.product === "custom" && values.notes.trim().length < 4) {
-      nextErrors.notes = "Jelaskan produk yang ingin dititipkan (minimal 4 karakter).";
+      nextErrors.notes =
+        "Jelaskan produk yang ingin dititipkan (minimal 4 karakter).";
     }
 
     setErrors(nextErrors);
@@ -117,7 +130,9 @@ export function RequestForm() {
       setShowCryptoDetails(true);
     } catch (err: unknown) {
       setServerError(
-        err instanceof Error ? err.message : "Terjadi kesalahan saat memproses data ke server."
+        err instanceof Error
+          ? err.message
+          : "Terjadi kesalahan saat memproses data ke server.",
       );
     } finally {
       setIsSubmitting(false);
@@ -146,7 +161,9 @@ export function RequestForm() {
       setDecryptedAddress(data.address);
     } catch (err: unknown) {
       setServerError(
-        err instanceof Error ? err.message : "Verifikasi dekripsi gagal dijalankan."
+        err instanceof Error
+          ? err.message
+          : "Verifikasi dekripsi gagal dijalankan.",
       );
     } finally {
       setIsDecrypting(false);
@@ -157,7 +174,9 @@ export function RequestForm() {
     <form className="request-form" noValidate onSubmit={handleSubmit}>
       <div className="form-grid">
         <div className="field">
-          <label htmlFor="name">Nama lengkap <span aria-hidden="true">*</span></label>
+          <label htmlFor="name">
+            Nama lengkap <span aria-hidden="true">*</span>
+          </label>
           <input
             aria-describedby={errors.name ? "name-error" : undefined}
             aria-invalid={Boolean(errors.name)}
@@ -167,11 +186,17 @@ export function RequestForm() {
             required
             value={values.name}
           />
-          {errors.name && <p className="field-error" id="name-error">{errors.name}</p>}
+          {errors.name && (
+            <p className="field-error" id="name-error">
+              {errors.name}
+            </p>
+          )}
         </div>
 
         <div className="field">
-          <label htmlFor="email">Email <span aria-hidden="true">*</span></label>
+          <label htmlFor="email">
+            Email <span aria-hidden="true">*</span>
+          </label>
           <input
             aria-describedby={errors.email ? "email-error" : undefined}
             aria-invalid={Boolean(errors.email)}
@@ -182,11 +207,17 @@ export function RequestForm() {
             type="email"
             value={values.email}
           />
-          {errors.email && <p className="field-error" id="email-error">{errors.email}</p>}
+          {errors.email && (
+            <p className="field-error" id="email-error">
+              {errors.email}
+            </p>
+          )}
         </div>
 
         <div className="field">
-          <label htmlFor="phone">Nomor WhatsApp <span aria-hidden="true">*</span></label>
+          <label htmlFor="phone">
+            Nomor WhatsApp <span aria-hidden="true">*</span>
+          </label>
           <input
             aria-describedby={errors.phone ? "phone-error" : undefined}
             aria-invalid={Boolean(errors.phone)}
@@ -199,11 +230,17 @@ export function RequestForm() {
             type="tel"
             value={values.phone}
           />
-          {errors.phone && <p className="field-error" id="phone-error">{errors.phone}</p>}
+          {errors.phone && (
+            <p className="field-error" id="phone-error">
+              {errors.phone}
+            </p>
+          )}
         </div>
 
         <div className="field">
-          <label htmlFor="product">Produk yang ingin dititipkan <span aria-hidden="true">*</span></label>
+          <label htmlFor="product">
+            Produk yang ingin dititipkan <span aria-hidden="true">*</span>
+          </label>
           <select
             aria-describedby={errors.product ? "product-error" : undefined}
             aria-invalid={Boolean(errors.product)}
@@ -220,11 +257,17 @@ export function RequestForm() {
             ))}
             <option value="custom">Produk lain (tulis di catatan)</option>
           </select>
-          {errors.product && <p className="field-error" id="product-error">{errors.product}</p>}
+          {errors.product && (
+            <p className="field-error" id="product-error">
+              {errors.product}
+            </p>
+          )}
         </div>
 
         <div className="field">
-          <label htmlFor="quantity">Jumlah <span aria-hidden="true">*</span></label>
+          <label htmlFor="quantity">
+            Jumlah <span aria-hidden="true">*</span>
+          </label>
           <input
             aria-describedby={errors.quantity ? "quantity-error" : undefined}
             aria-invalid={Boolean(errors.quantity)}
@@ -235,7 +278,11 @@ export function RequestForm() {
             type="number"
             value={values.quantity}
           />
-          {errors.quantity && <p className="field-error" id="quantity-error">{errors.quantity}</p>}
+          {errors.quantity && (
+            <p className="field-error" id="quantity-error">
+              {errors.quantity}
+            </p>
+          )}
         </div>
 
         <div className="field">
@@ -243,7 +290,9 @@ export function RequestForm() {
             Kota tujuan pengiriman <span aria-hidden="true">*</span>
           </label>
           <input
-            aria-describedby={errors.destination ? "destination-error" : undefined}
+            aria-describedby={
+              errors.destination ? "destination-error" : undefined
+            }
             aria-invalid={Boolean(errors.destination)}
             autoComplete="address-level2"
             id="destination"
@@ -252,14 +301,20 @@ export function RequestForm() {
             required
             value={values.destination}
           />
-          {errors.destination && <p className="field-error" id="destination-error">{errors.destination}</p>}
+          {errors.destination && (
+            <p className="field-error" id="destination-error">
+              {errors.destination}
+            </p>
+          )}
         </div>
 
         <div className="field field--full">
           <label htmlFor="notes">
             Catatan untuk jastiper{" "}
             <span className="optional-label">
-              {values.product === "custom" ? "(wajib untuk produk lain)" : "(opsional)"}
+              {values.product === "custom"
+                ? "(wajib untuk produk lain)"
+                : "(opsional)"}
             </span>
           </label>
           <textarea
@@ -272,20 +327,31 @@ export function RequestForm() {
             rows={4}
             value={values.notes}
           />
-          {errors.notes && <p className="field-error" id="notes-error">{errors.notes}</p>}
+          {errors.notes && (
+            <p className="field-error" id="notes-error">
+              {errors.notes}
+            </p>
+          )}
         </div>
       </div>
 
-      <p className="form-note">
-      </p>
+      <p className="form-note"></p>
 
-      <button className="button form-submit" disabled={isSubmitting} type="submit">
+      <button
+        className="button form-submit"
+        disabled={isSubmitting}
+        type="submit"
+      >
         {isSubmitting ? "Mengenkripsi & Mengirim..." : "Kirim permintaan aman "}
         <span aria-hidden="true">↗</span>
       </button>
 
       {serverError && (
-        <div className="form-summary" role="alert" style={{ marginTop: "1rem" }}>
+        <div
+          className="form-summary"
+          role="alert"
+          style={{ marginTop: "1rem" }}
+        >
           <strong>Peringatan Server:</strong> {serverError}
         </div>
       )}
@@ -303,7 +369,15 @@ export function RequestForm() {
             color: "#166534",
           }}
         >
-          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: "8px" }}>
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              flexWrap: "wrap",
+              gap: "8px",
+            }}
+          >
             <strong style={{ fontSize: "1.05rem" }}>
               ✅ Permintaan #{orderResponse.orderId} Berhasil Disimpan!
             </strong>
@@ -321,8 +395,16 @@ export function RequestForm() {
             </span>
           </div>
 
-          <p style={{ marginTop: "0.5rem", marginBottom: "0.75rem", fontSize: "0.95rem" }}>
-            Pesanan untuk <strong>{orderResponse.order.customerName}</strong> telah diterima. Alamat pengiriman konsumen (Aset <code>D-05</code>) telah diamankan menggunakan enkripsi autentikasi AES-256-GCM.
+          <p
+            style={{
+              marginTop: "0.5rem",
+              marginBottom: "0.75rem",
+              fontSize: "0.95rem",
+            }}
+          >
+            Pesanan untuk <strong>{orderResponse.order.customerName}</strong>{" "}
+            telah diterima. Alamat pengiriman konsumen (Aset <code>D-05</code>)
+            telah diamankan menggunakan enkripsi autentikasi AES-256-GCM.
           </p>
 
           <button
@@ -340,7 +422,9 @@ export function RequestForm() {
               display: "inline-block",
             }}
           >
-            {showCryptoDetails ? "Sembunyikan Detail Kriptografi ▲" : "Lihat Detail Kriptografi (Ciphertext, IV, Tag) ▼"}
+            {showCryptoDetails
+              ? "Sembunyikan Detail Kriptografi ▲"
+              : "Lihat Detail Kriptografi (Ciphertext, IV, Tag) ▼"}
           </button>
 
           {showCryptoDetails && (
@@ -356,7 +440,9 @@ export function RequestForm() {
               }}
             >
               <div style={{ marginBottom: "0.5rem" }}>
-                <span style={{ fontWeight: 600, color: "#475569" }}>Ciphertext (Base64):</span>
+                <span style={{ fontWeight: 600, color: "#475569" }}>
+                  Ciphertext (Base64):
+                </span>
                 <code
                   style={{
                     display: "block",
@@ -372,9 +458,18 @@ export function RequestForm() {
                 </code>
               </div>
 
-              <div style={{ marginBottom: "0.5rem", display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px" }}>
+              <div
+                style={{
+                  marginBottom: "0.5rem",
+                  display: "grid",
+                  gridTemplateColumns: "1fr 1fr",
+                  gap: "8px",
+                }}
+              >
                 <div>
-                  <span style={{ fontWeight: 600, color: "#475569" }}>IV (12 Byte CSPRNG):</span>
+                  <span style={{ fontWeight: 600, color: "#475569" }}>
+                    IV (12 Byte CSPRNG):
+                  </span>
                   <code
                     style={{
                       display: "block",
@@ -390,7 +485,9 @@ export function RequestForm() {
                   </code>
                 </div>
                 <div>
-                  <span style={{ fontWeight: 600, color: "#475569" }}>Auth Tag (16 Byte GCM):</span>
+                  <span style={{ fontWeight: 600, color: "#475569" }}>
+                    Auth Tag (16 Byte GCM):
+                  </span>
                   <code
                     style={{
                       display: "block",
@@ -407,7 +504,13 @@ export function RequestForm() {
                 </div>
               </div>
 
-              <div style={{ marginTop: "1rem", borderTop: "1px dashed #cbd5e1", paddingTop: "0.75rem" }}>
+              <div
+                style={{
+                  marginTop: "1rem",
+                  borderTop: "1px dashed #cbd5e1",
+                  paddingTop: "0.75rem",
+                }}
+              >
                 <button
                   type="button"
                   onClick={handleVerifyDecryption}
@@ -423,17 +526,34 @@ export function RequestForm() {
                     fontWeight: 600,
                   }}
                 >
-                  {isDecrypting ? "Memverifikasi..." : "🔓 Uji Verifikasi & Dekripsi Server"}
+                  {isDecrypting
+                    ? "Memverifikasi..."
+                    : "🔓 Uji Verifikasi & Dekripsi Server"}
                 </button>
 
                 {decryptedAddress && (
-                  <div style={{ marginTop: "0.75rem", padding: "8px", background: "#f0fdf4", borderRadius: "6px", border: "1px solid #86efac" }}>
+                  <div
+                    style={{
+                      marginTop: "0.75rem",
+                      padding: "8px",
+                      background: "#f0fdf4",
+                      borderRadius: "6px",
+                      border: "1px solid #86efac",
+                    }}
+                  >
                     <span style={{ fontWeight: 600, color: "#166534" }}>
                       Hasil Dekripsi Terverifikasi:
                     </span>{" "}
                     <span style={{ color: "#1e293b" }}>{decryptedAddress}</span>
-                    <p style={{ margin: "4px 0 0", fontSize: "0.75rem", color: "#15803d" }}>
-                      ✓ Integritas dan keaslian data terverifikasi oleh authentication tag AES-256-GCM.
+                    <p
+                      style={{
+                        margin: "4px 0 0",
+                        fontSize: "0.75rem",
+                        color: "#15803d",
+                      }}
+                    >
+                      ✓ Integritas dan keaslian data terverifikasi oleh
+                      authentication tag AES-256-GCM.
                     </p>
                   </div>
                 )}
@@ -445,7 +565,8 @@ export function RequestForm() {
 
       {Object.keys(errors).length > 0 && (
         <p className="form-summary" role="alert">
-          Masih ada {Object.keys(errors).length} bagian yang perlu diperiksa. Perbaiki isian yang ditandai di atas.
+          Masih ada {Object.keys(errors).length} bagian yang perlu diperiksa.
+          Perbaiki isian yang ditandai di atas.
         </p>
       )}
     </form>

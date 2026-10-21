@@ -11,7 +11,13 @@ export interface Product {
   description: string;
 }
 
-export const categories = ["Semua", "Makanan", "Fashion", "Minuman", "Oleh-oleh"] as const;
+export const categories = [
+  "Semua",
+  "Makanan",
+  "Fashion",
+  "Minuman",
+  "Oleh-oleh",
+] as const;
 
 export const products: Product[] = [
   {
@@ -22,7 +28,8 @@ export const products: Product[] = [
     price: 35000,
     rating: 4.9,
     illustration: "🥔",
-    description: "Keripik singkong renyah dengan bumbu balado khas Minang yang kaya rasa.",
+    description:
+      "Keripik singkong renyah dengan bumbu balado khas Minang yang kaya rasa.",
   },
   {
     id: "P002",
@@ -32,7 +39,8 @@ export const products: Product[] = [
     price: 45000,
     rating: 4.8,
     illustration: "🥮",
-    description: "Bakpia lembut dengan isian kacang hijau yang dibuat segar setiap hari.",
+    description:
+      "Bakpia lembut dengan isian kacang hijau yang dibuat segar setiap hari.",
   },
   {
     id: "P003",
@@ -42,7 +50,8 @@ export const products: Product[] = [
     price: 85000,
     rating: 4.9,
     illustration: "☕",
-    description: "Kopi pegunungan dengan aroma floral dan rasa yang bersih serta seimbang.",
+    description:
+      "Kopi pegunungan dengan aroma floral dan rasa yang bersih serta seimbang.",
   },
   {
     id: "P004",
@@ -52,7 +61,8 @@ export const products: Product[] = [
     price: 275000,
     rating: 4.7,
     illustration: "🧵",
-    description: "Kain batik bermotif klasik yang dikerjakan perajin lokal dengan teliti.",
+    description:
+      "Kain batik bermotif klasik yang dikerjakan perajin lokal dengan teliti.",
   },
   {
     id: "P005",
@@ -62,7 +72,8 @@ export const products: Product[] = [
     price: 60000,
     rating: 4.8,
     illustration: "🍲",
-    description: "Pempek ikan dengan cuko khas Palembang, dikemas dingin untuk perjalanan.",
+    description:
+      "Pempek ikan dengan cuko khas Palembang, dikemas dingin untuk perjalanan.",
   },
   {
     id: "P006",
@@ -72,7 +83,8 @@ export const products: Product[] = [
     price: 110000,
     rating: 4.6,
     illustration: "👕",
-    description: "Kaos berbahan katun nyaman dengan ilustrasi yang terinspirasi sudut Bandung.",
+    description:
+      "Kaos berbahan katun nyaman dengan ilustrasi yang terinspirasi sudut Bandung.",
   },
 ];
 

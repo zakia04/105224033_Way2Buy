@@ -70,7 +70,7 @@ export function getEncryptionKey(envKey?: string): Buffer {
   if (!raw || raw.trim().length === 0) {
     throw new Error(
       "Kunci enkripsi tidak ditemukan. " +
-        "Pastikan variabel lingkungan WAY2BUY_ENCRYPTION_KEY sudah diisi."
+        "Pastikan variabel lingkungan WAY2BUY_ENCRYPTION_KEY sudah diisi.",
     );
   }
 
@@ -80,7 +80,7 @@ export function getEncryptionKey(envKey?: string): Buffer {
     throw new Error(
       `Panjang kunci tidak valid: diharapkan ${CRYPTO_CONFIG.KEY_LENGTH} byte, ` +
         `diterima ${keyBuffer.length} byte. ` +
-        "Pastikan kunci berupa string Base64 dari 32 byte acak."
+        "Pastikan kunci berupa string Base64 dari 32 byte acak.",
     );
   }
 
@@ -99,9 +99,7 @@ export function getEncryptionKey(envKey?: string): Buffer {
  */
 export function validateAddress(input: unknown): asserts input is string {
   if (typeof input !== "string") {
-    throw new Error(
-      `Input harus berupa string, diterima: ${typeof input}.`
-    );
+    throw new Error(`Input harus berupa string, diterima: ${typeof input}.`);
   }
 
   if (input.trim().length === 0) {
@@ -111,7 +109,7 @@ export function validateAddress(input: unknown): asserts input is string {
   if (input.length > CRYPTO_CONFIG.MAX_ADDRESS_LENGTH) {
     throw new Error(
       `Panjang alamat melebihi batas maksimum (${CRYPTO_CONFIG.MAX_ADDRESS_LENGTH} karakter). ` +
-        `Panjang saat ini: ${input.length} karakter.`
+        `Panjang saat ini: ${input.length} karakter.`,
     );
   }
 }
@@ -144,7 +142,7 @@ export function validateAddress(input: unknown): asserts input is string {
  */
 export function encryptAddress(
   address: string,
-  keyBase64?: string
+  keyBase64?: string,
 ): EncryptedData {
   // 1. Validasi masukan
   validateAddress(address);
@@ -203,18 +201,18 @@ export function encryptAddress(
  */
 export function decryptAddress(
   data: EncryptedData,
-  keyBase64?: string
+  keyBase64?: string,
 ): string {
   // 1. Validasi masukan
   if (!data || typeof data !== "object") {
     throw new Error(
-      "Parameter dekripsi tidak valid: objek EncryptedData diperlukan."
+      "Parameter dekripsi tidak valid: objek EncryptedData diperlukan.",
     );
   }
 
   if (!data.ciphertext || !data.iv || !data.authTag) {
     throw new Error(
-      "Data terenkripsi tidak lengkap: ciphertext, iv, dan authTag wajib ada."
+      "Data terenkripsi tidak lengkap: ciphertext, iv, dan authTag wajib ada.",
     );
   }
 

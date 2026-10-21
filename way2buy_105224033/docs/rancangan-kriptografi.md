@@ -9,6 +9,7 @@ Dokumen ini menjelaskan secara teknis dan mendalam perancangan komponen kriptogr
 Way2Buy merupakan platform perantara pemesanan produk lokal (jastip). Konsumen menitipkan pembelian produk ke jastiper lokal yang sedang berada di kota asal produk.
 
 Dalam alur bisnis ini, konsumen memberikan informasi alamat pengiriman agar jastiper atau kurir dapat mengirimkan barang yang telah dibeli. Alamat pengiriman merupakan **Personally Identifiable Information (PII)** dan diklasifikasikan sebagai:
+
 - **Aset D-05 (Data Pesanan)** dalam `security/asset-inventory.md`.
 - **Kebutuhan Keamanan:** Kerahasiaan (Confidentiality) dan Integritas (Integrity).
 - **Tingkat Prioritas:** Tinggi (High).
@@ -20,11 +21,11 @@ Dalam alur bisnis ini, konsumen memberikan informasi alamat pengiriman agar jast
 Berdasarkan analisis ancaman pada `security/threat-model.md`:
 
 1. **T-09 — Akses Langsung Basis Data (Information Disclosure):**
-   Jika penyerang berhasil mengakses database Way2Buy melalui celah keamanan infrastruktur, alamat pengiriman konsumen tidak boleh terbaca dalam bentuk teks polos (*plaintext*).
+   Jika penyerang berhasil mengakses database Way2Buy melalui celah keamanan infrastruktur, alamat pengiriman konsumen tidak boleh terbaca dalam bentuk teks polos (_plaintext_).
 2. **T-10 — Kebocoran Cadangan Basis Data (Backup Disclosure):**
-   Salinan cadangan database (Aset B-01 / F6) yang bocor atau dicuri penyerang tidak akan mengekspos alamat konsumen karena tersimpan dalam bentuk *ciphertext*.
+   Salinan cadangan database (Aset B-01 / F6) yang bocor atau dicuri penyerang tidak akan mengekspos alamat konsumen karena tersimpan dalam bentuk _ciphertext_.
 3. **T-03 — Manipulasi Parameter Pesanan (Tampering):**
-   Penyerang di jalur transit (*Man-in-the-Middle*) atau pihak ketiga yang berusaha memanipulasi alamat pengiriman akan langsung terdeteksi karena perubahan pada ciphertext akan menggagalkan verifikasi *Authentication Tag*.
+   Penyerang di jalur transit (_Man-in-the-Middle_) atau pihak ketiga yang berusaha memanipulasi alamat pengiriman akan langsung terdeteksi karena perubahan pada ciphertext akan menggagalkan verifikasi _Authentication Tag_.
 
 ---
 
@@ -44,6 +45,7 @@ Berdasarkan analisis ancaman pada `security/threat-model.md`:
 ```
 
 ### 3.1 Diagram Alir Enkripsi
+
 ```
 [ Alamat Plaintext ]
          │
@@ -71,6 +73,7 @@ Berdasarkan analisis ancaman pada `security/threat-model.md`:
 ```
 
 ### 3.2 Diagram Alir Dekripsi
+
 ```
 [ EncryptedData { ciphertext, iv, authTag } ]
          │
@@ -103,4 +106,4 @@ Berdasarkan analisis ancaman pada `security/threat-model.md`:
    ```bash
    node -e "console.log(require('node:crypto').randomBytes(32).toString('base64'))"
    ```
-3. **Pemisahan Lingkungan:** Pengujian otomatis (`tests/crypto.test.ts`) menggunakan kunci sintetis terisolasi yang di-*generate* saat runtime pengujian, sehingga pengujian tidak bergantung pada file eksternal maupun kunci produksi.
+3. **Pemisahan Lingkungan:** Pengujian otomatis (`tests/crypto.test.ts`) menggunakan kunci sintetis terisolasi yang di-_generate_ saat runtime pengujian, sehingga pengujian tidak bergantung pada file eksternal maupun kunci produksi.
