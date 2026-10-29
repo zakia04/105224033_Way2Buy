@@ -8,13 +8,13 @@ Risk Assessment merupakan proses evaluasi terhadap setiap ancaman yang telah dii
 
 Likelihood mengukur seberapa besar kemungkinan suatu ancaman dapat terjadi. Penilaian likelihood mempertimbangkan faktor-faktor seperti kemudahan eksploitasi, ketersediaan tools penyerang, tingkat keahlian yang dibutuhkan, serta kondisi kontrol keamanan yang saat ini diterapkan pada sistem.
 
-| Nilai | Kategori | Keterangan |
-|---|---|---|
-| 5 | Very High | Sangat mungkin terjadi |
-| 4 | High | Kemungkinan tinggi terjadi |
-| 3 | Moderate | Kemungkinan sedang terjadi |
-| 2 | Low | Kemungkinan rendah terjadi |
-| 1 | Very Low | Sangat kecil kemungkinan terjadi |
+| Nilai | Kategori  | Keterangan                       |
+| ----- | --------- | -------------------------------- |
+| 5     | Very High | Sangat mungkin terjadi           |
+| 4     | High      | Kemungkinan tinggi terjadi       |
+| 3     | Moderate  | Kemungkinan sedang terjadi       |
+| 2     | Low       | Kemungkinan rendah terjadi       |
+| 1     | Very Low  | Sangat kecil kemungkinan terjadi |
 
 ---
 
@@ -22,13 +22,13 @@ Likelihood mengukur seberapa besar kemungkinan suatu ancaman dapat terjadi. Peni
 
 Impact mengukur seberapa besar dampak yang ditimbulkan jika suatu ancaman berhasil dieksploitasi. Penilaian impact mempertimbangkan potensi kerugian terhadap kerahasiaan data, integritas sistem, ketersediaan layanan, reputasi organisasi, serta kerugian finansial yang mungkin terjadi.
 
-| Nilai | Kategori | Keterangan |
-|---|---|---|
-| 5 | Very High | Dampak sangat besar terhadap kerahasiaan, integritas, atau ketersediaan |
-| 4 | High | Dampak besar terhadap sistem atau data |
-| 3 | Moderate | Dampak sedang |
-| 2 | Low | Dampak kecil |
-| 1 | Very Low | Dampak sangat kecil |
+| Nilai | Kategori  | Keterangan                                                              |
+| ----- | --------- | ----------------------------------------------------------------------- |
+| 5     | Very High | Dampak sangat besar terhadap kerahasiaan, integritas, atau ketersediaan |
+| 4     | High      | Dampak besar terhadap sistem atau data                                  |
+| 3     | Moderate  | Dampak sedang                                                           |
+| 2     | Low       | Dampak kecil                                                            |
+| 1     | Very Low  | Dampak sangat kecil                                                     |
 
 ---
 
@@ -44,12 +44,12 @@ Risk = Likelihood × Impact
 
 Kategori risiko:
 
-| Score | Kategori |
-|---|---|
+| Score | Kategori  |
+| ----- | --------- |
 | 15–25 | Very High |
-| 8–14 | High |
-| 4–7 | Moderate |
-| 1–3 | Low |
+| 8–14  | High      |
+| 4–7   | Moderate  |
+| 1–3   | Low       |
 
 ---
 
@@ -57,20 +57,20 @@ Kategori risiko:
 
 Risk Register merupakan tabel yang merangkum seluruh hasil penilaian risiko untuk setiap threat yang telah diidentifikasi. Tabel ini menjadi acuan utama dalam menentukan prioritas penanganan risiko dan alokasi sumber daya keamanan.
 
-| ID | Threat | Likelihood | Impact | Risk Score | Level | Alasan |
-|---|---|---:|---:|---:|---|---|
-| T-01 | Credential stuffing / account takeover | 4 | 4 | 16 | Very High | Serangan terhadap login relatif mudah dilakukan dan dapat menyebabkan pengambilalihan akun. |
-| T-02 | Privilege escalation ke admin | 4 | 5 | 20 | Very High | Admin memiliki hak akses tinggi sehingga kompromi akun dapat berdampak besar terhadap sistem. |
-| T-03 | Manipulasi parameter pesanan | 4 | 4 | 16 | Very High | Manipulasi order dapat menyebabkan kerugian transaksi dan perubahan data pesanan. |
-| T-04 | SQL Injection | 3 | 5 | 15 | Very High | SQL Injection dapat memberikan akses terhadap data sensitif dalam database. |
-| T-05 | Data exposed in transit | 2 | 5 | 10 | High | Jika komunikasi tidak dilindungi TLS, data sensitif dapat disadap. |
-| T-06 | Flooding / DoS | 4 | 4 | 16 | Very High | Request dalam jumlah besar dapat mengganggu availability layanan. |
-| T-07 | Repudiation karena audit log tidak memadai | 3 | 3 | 9 | High | Aktivitas penting sulit dibuktikan apabila tidak terdapat pencatatan yang memadai. |
-| T-08 | Fake Payment Gateway response | 3 | 5 | 15 | Very High | Pembayaran palsu dapat menyebabkan sistem menganggap transaksi berhasil tanpa pembayaran sebenarnya. |
-| T-09 | Direct database access | 3 | 5 | 15 | Very High | Akses langsung ke database dapat mengekspos data dalam jumlah besar. |
-| T-10 | Backup disclosure | 3 | 5 | 15 | Very High | Backup dapat berisi data aplikasi dalam jumlah besar sehingga kebocoran berdampak tinggi. |
-| T-11 | Unauthorized jastiper data modification | 3 | 3 | 9 | High | Perubahan tidak sah dapat merusak informasi layanan dan reputasi jastiper. |
-| T-12 | Backup deletion/damage | 2 | 5 | 10 | High | Kerusakan backup dapat menghambat proses pemulihan sistem ketika terjadi insiden. |
+| ID   | Threat                                     | Likelihood | Impact | Risk Score | Level     | Alasan                                                                                               |
+| ---- | ------------------------------------------ | ---------: | -----: | ---------: | --------- | ---------------------------------------------------------------------------------------------------- |
+| T-01 | Credential stuffing / account takeover     |          4 |      4 |         16 | Very High | Serangan terhadap login relatif mudah dilakukan dan dapat menyebabkan pengambilalihan akun.          |
+| T-02 | Privilege escalation ke admin              |          4 |      5 |         20 | Very High | Admin memiliki hak akses tinggi sehingga kompromi akun dapat berdampak besar terhadap sistem.        |
+| T-03 | Manipulasi parameter pesanan               |          4 |      4 |         16 | Very High | Manipulasi order dapat menyebabkan kerugian transaksi dan perubahan data pesanan.                    |
+| T-04 | SQL Injection                              |          3 |      5 |         15 | Very High | SQL Injection dapat memberikan akses terhadap data sensitif dalam database.                          |
+| T-05 | Data exposed in transit                    |          2 |      5 |         10 | High      | Jika komunikasi tidak dilindungi TLS, data sensitif dapat disadap.                                   |
+| T-06 | Flooding / DoS                             |          4 |      4 |         16 | Very High | Request dalam jumlah besar dapat mengganggu availability layanan.                                    |
+| T-07 | Repudiation karena audit log tidak memadai |          3 |      3 |          9 | High      | Aktivitas penting sulit dibuktikan apabila tidak terdapat pencatatan yang memadai.                   |
+| T-08 | Fake Payment Gateway response              |          3 |      5 |         15 | Very High | Pembayaran palsu dapat menyebabkan sistem menganggap transaksi berhasil tanpa pembayaran sebenarnya. |
+| T-09 | Direct database access                     |          3 |      5 |         15 | Very High | Akses langsung ke database dapat mengekspos data dalam jumlah besar.                                 |
+| T-10 | Backup disclosure                          |          3 |      5 |         15 | Very High | Backup dapat berisi data aplikasi dalam jumlah besar sehingga kebocoran berdampak tinggi.            |
+| T-11 | Unauthorized jastiper data modification    |          3 |      3 |          9 | High      | Perubahan tidak sah dapat merusak informasi layanan dan reputasi jastiper.                           |
+| T-12 | Backup deletion/damage                     |          2 |      5 |         10 | High      | Kerusakan backup dapat menghambat proses pemulihan sistem ketika terjadi insiden.                    |
 
 ---
 
@@ -78,13 +78,13 @@ Risk Register merupakan tabel yang merangkum seluruh hasil penilaian risiko untu
 
 Berdasarkan hasil risk assessment, lima risiko berikut dipilih sebagai prioritas tertinggi karena memiliki risk score paling besar. Kelima risiko ini memerlukan penanganan segera melalui strategi **Mitigate**, yaitu menerapkan kontrol keamanan yang bertujuan untuk mengurangi likelihood dan/atau impact dari masing-masing risiko.
 
-| Prioritas | ID | Risiko | Score | Response |
-|---|---|---|---:|---|
-| 1 | T-02 | Privilege escalation ke admin | 20 | Mitigate |
-| 2 | T-01 | Credential stuffing / account takeover | 16 | Mitigate |
-| 3 | T-03 | Manipulasi parameter pesanan | 16 | Mitigate |
-| 4 | T-06 | Denial of Service | 16 | Mitigate |
-| 5 | T-04 | SQL Injection | 15 | Mitigate |
+| Prioritas | ID   | Risiko                                 | Score | Response |
+| --------- | ---- | -------------------------------------- | ----: | -------- |
+| 1         | T-02 | Privilege escalation ke admin          |    20 | Mitigate |
+| 2         | T-01 | Credential stuffing / account takeover |    16 | Mitigate |
+| 3         | T-03 | Manipulasi parameter pesanan           |    16 | Mitigate |
+| 4         | T-06 | Denial of Service                      |    16 | Mitigate |
+| 5         | T-04 | SQL Injection                          |    15 | Mitigate |
 
 ---
 
@@ -137,7 +137,7 @@ Penyerang mengubah harga, jumlah, atau status pesanan melalui request.
 
 - Melakukan validasi input di sisi server.
 - Melakukan authorization pada setiap operasi pesanan.
-- Menerapkan enkripsi simetris terotentikasi (AES-256-GCM) pada data pesanan sensitif (alamat pengiriman konsumen D-05) di sisi server (`way2buy/lib/crypto.ts`) untuk menjamin integritas melalui *authentication tag*.
+- Menerapkan enkripsi simetris terotentikasi (AES-256-GCM) pada data pesanan sensitif (alamat pengiriman konsumen D-05) di sisi server (`way2buy/lib/crypto.ts`) untuk menjamin integritas melalui _authentication tag_.
 - Tidak mempercayai harga atau status yang dikirim oleh client.
 - Mengambil harga dari sumber data server.
 - Memvalidasi kembali data sebelum transaksi diproses.

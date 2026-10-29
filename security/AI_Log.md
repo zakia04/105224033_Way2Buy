@@ -41,4 +41,4 @@ AI digunakan untuk membantu perancangan dan integrasi komponen kriptografi dasar
 2. Memetakan mitigasi ancaman STRIDE **T-03** (tampering), **T-09** (direct DB access), dan **T-10** (backup disclosure).
 3. Menyusun 8 skenario pengujian unit otomatis pada `way2buy/tests/crypto.test.ts`.
 4. Mengintegrasikan komponen kriptografi pada API backend (`app/api/crypto` & `app/api/orders`), form pemesanan (`RequestForm.tsx`), serta halaman laboratorium keamanan (`app/kripto/page.tsx`).
-5. Memvalidasi bahwa seluruh data uji bersifat sintetis dan tidak ada rahasia/kunci privat di repositori.
+5. Memvalidasi bahwa seluruh data uji bersifat sintetis dan tidak ada rahasia/kunci privat di repositori.
