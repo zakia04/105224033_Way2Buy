@@ -1,43 +1,27 @@
 import { NextRequest, NextResponse } from "next/server";
 import { encryptAddress, EncryptedData } from "@/lib/crypto";
-
-interface OrderPayload {
-  name: string;
-  email: string;
-  phone: string;
-  product: string;
-  quantity: string;
-  destination: string;
-  notes?: string;
-}
+import { orderSchema } from "@/lib/schema/order.schema";
 
 export async function POST(request: NextRequest) {
   try {
-    const body: OrderPayload = await request.json();
-
-    // Validasi dasar server-side (Mitigasi T-03: Tampering parameter pesanan)
-    if (!body.name || body.name.trim().length < 2) {
+    const validation = orderSchema.safeParse(await request.json());
+    if (!validation.success) {
       return NextResponse.json(
-        { error: "Nama minimal 2 karakter." },
+        {
+          error: validation.error.issues[0]?.message ?? "Data pesanan tidak valid.",
+          issues: validation.error.issues.map(({ path, message }) => ({
+            path,
+            message,
+          })),
+        },
         { status: 400 },
       );
     }
-    if (!body.email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(body.email)) {
-      return NextResponse.json(
-        { error: "Alamat email tidak valid." },
-        { status: 400 },
-      );
-    }
-    if (!body.destination || body.destination.trim().length < 3) {
-      return NextResponse.json(
-        { error: "Kota tujuan pengiriman harus diisi." },
-        { status: 400 },
-      );
-    }
+    const body = validation.data;
 
     // Penerapan Kriptografi: Enkripsi Alamat Pengiriman (Aset D-05) dengan AES-256-GCM
     const encryptedDestination: EncryptedData = encryptAddress(
-      body.destination.trim(),
+      body.destination,
     );
 
     // Bentuk ID pesanan sintetis
@@ -50,7 +34,7 @@ export async function POST(request: NextRequest) {
         "Permintaan titip berhasil diproses dan alamat pengiriman telah diamankan dengan AES-256-GCM.",
       order: {
         orderId,
-        customerName: body.name.trim(),
+        customerName: body.name,
         product: body.product,
         quantity: Number(body.quantity) || 1,
         // Alamat disimpan dalam bentuk terenkripsi (at-rest & in-transit)

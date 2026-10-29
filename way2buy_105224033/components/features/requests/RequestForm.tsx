@@ -2,6 +2,7 @@
 
 import { FormEvent, useState } from "react";
 import { products } from "../../../lib/catalog/products";
+import { orderSchema } from "@/lib/schema/order.schema";
 
 interface FormValues {
   name: string;
@@ -76,49 +77,30 @@ export function RequestForm() {
     setServerError(null);
     setDecryptedAddress(null);
 
-    const nextErrors: FormErrors = {};
-    if (values.name.trim().length < 2)
-      nextErrors.name = "Nama minimal terdiri dari 2 karakter.";
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(values.email.trim())) {
-      nextErrors.email =
-        "Masukkan alamat email yang valid, misalnya nama@email.com.";
-    }
-    const phoneDigits = values.phone.replace(/\D/g, "");
-    if (
-      !/^[0-9+()\-\s]+$/.test(values.phone.trim()) ||
-      phoneDigits.length < 9 ||
-      phoneDigits.length > 16
-    ) {
-      nextErrors.phone = "Masukkan nomor WhatsApp yang valid (9–16 digit).";
-    }
-    if (!values.product)
-      nextErrors.product = "Pilih produk yang ingin dititipkan.";
-    if (
-      !Number.isInteger(Number(values.quantity)) ||
-      Number(values.quantity) < 1
-    ) {
-      nextErrors.quantity = "Jumlah minimal 1.";
-    }
-    if (values.destination.trim().length < 3) {
-      nextErrors.destination = "Masukkan kota tujuan pengiriman.";
-    }
-    if (values.product === "custom" && values.notes.trim().length < 4) {
-      nextErrors.notes =
-        "Jelaskan produk yang ingin dititipkan (minimal 4 karakter).";
-    }
-
-    setErrors(nextErrors);
-
-    if (Object.keys(nextErrors).length > 0) {
+    const validation = orderSchema.safeParse(values);
+    if (!validation.success) {
+      const nextErrors: FormErrors = {};
+      for (const issue of validation.error.issues) {
+        const field = issue.path[0];
+        if (
+          typeof field === "string" &&
+          field in values &&
+          !nextErrors[field as keyof FormValues]
+        ) {
+          nextErrors[field as keyof FormValues] = issue.message;
+        }
+      }
+      setErrors(nextErrors);
       return;
     }
+    setErrors({});
 
     setIsSubmitting(true);
     try {
       const res = await fetch("/api/orders", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(values),
+        body: JSON.stringify(validation.data),
       });
 
       const data = await res.json();

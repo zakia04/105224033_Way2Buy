@@ -142,9 +142,9 @@ Daftar produk mencakup representasi ragam daerah nusantara:
 
 ---
 
-### 1.8 Formulir & Validasi Sisi Klien
+### 1.8 Formulir & Validasi
 
-Formulir permintaan titip pada [`components/features/requests/RequestForm.tsx`](./components/features/requests/RequestForm.tsx) menerapkan validasi sisi klien (_client-side validation_) secara ketat sebelum data dikirimkan:
+Formulir permintaan titip pada [`components/features/requests/RequestForm.tsx`](./components/features/requests/RequestForm.tsx) menggunakan schema Zod bersama dari [`lib/schema/order.schema.ts`](./lib/schema/order.schema.ts). Schema yang sama memvalidasi input di sisi klien sebelum dikirimkan dan di API server sebelum pesanan diproses:
 
 | Kolom Input              | Aturan Validasi                                    | Pesan Kesalahan                                                 |
 | ------------------------ | -------------------------------------------------- | --------------------------------------------------------------- |
@@ -157,6 +157,7 @@ Formulir permintaan titip pada [`components/features/requests/RequestForm.tsx`](
 | **Catatan Khusus**       | Minimal 4 karakter jika memilih opsi produk kustom | _"Jelaskan produk yang ingin dititipkan (minimal 4 karakter)."_ |
 
 - **Aksesibilitas Formulir:** Menggunakan atribut `aria-describedby` yang mengaitkan input dengan elemen pesan error `<p id="...-error">`, serta atribut `aria-invalid="true"` ketika terdapat kesalahan masukan.
+- **Validasi Server:** Endpoint `POST /api/orders` memakai schema yang sama, sehingga validasi tetap berjalan meskipun pemeriksaan sisi klien dilewati. Pilihan produk diperiksa terhadap katalog statis saat ini; aplikasi belum menggunakan database.
 
 ---
 
