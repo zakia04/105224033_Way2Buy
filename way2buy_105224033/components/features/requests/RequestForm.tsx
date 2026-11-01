@@ -1,9 +1,12 @@
-
 "use client";
 
 import { FormEvent, useState } from "react";
-import { products } from "../../../lib/catalog/products";
+import type { Product } from "../../../lib/catalog/products";
 import { orderSchema } from "@/lib/schema/order.schema";
+
+interface RequestFormProps {
+  products: Product[];
+}
 
 interface FormValues {
   name: string;
@@ -40,7 +43,7 @@ const initialValues: FormValues = {
   notes: "",
 };
 
-export function RequestForm() {
+export function RequestForm({ products }: RequestFormProps) {
   const [values, setValues] = useState<FormValues>(initialValues);
   const [errors, setErrors] = useState<FormErrors>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -117,6 +120,7 @@ export function RequestForm() {
           <label htmlFor="name">
             Nama lengkap <span aria-hidden="true">*</span>
           </label>
+
           <input
             aria-describedby={errors.name ? "name-error" : undefined}
             aria-invalid={Boolean(errors.name)}
@@ -126,6 +130,7 @@ export function RequestForm() {
             required
             value={values.name}
           />
+
           {errors.name && (
             <p className="field-error" id="name-error">
               {errors.name}
@@ -137,6 +142,7 @@ export function RequestForm() {
           <label htmlFor="email">
             Email <span aria-hidden="true">*</span>
           </label>
+
           <input
             aria-describedby={errors.email ? "email-error" : undefined}
             aria-invalid={Boolean(errors.email)}
@@ -147,6 +153,7 @@ export function RequestForm() {
             type="email"
             value={values.email}
           />
+
           {errors.email && (
             <p className="field-error" id="email-error">
               {errors.email}
@@ -158,6 +165,7 @@ export function RequestForm() {
           <label htmlFor="phone">
             Nomor WhatsApp <span aria-hidden="true">*</span>
           </label>
+
           <input
             aria-describedby={errors.phone ? "phone-error" : undefined}
             aria-invalid={Boolean(errors.phone)}
@@ -170,6 +178,7 @@ export function RequestForm() {
             type="tel"
             value={values.phone}
           />
+
           {errors.phone && (
             <p className="field-error" id="phone-error">
               {errors.phone}
@@ -182,6 +191,7 @@ export function RequestForm() {
             Produk yang ingin dititipkan{" "}
             <span aria-hidden="true">*</span>
           </label>
+
           <select
             aria-describedby={errors.product ? "product-error" : undefined}
             aria-invalid={Boolean(errors.product)}
@@ -191,15 +201,18 @@ export function RequestForm() {
             value={values.product}
           >
             <option value="">Pilih produk</option>
+
             {products.map((product) => (
               <option key={product.id} value={product.id}>
                 {product.name} · {product.origin}
               </option>
             ))}
+
             <option value="custom">
               Produk lain (tulis di catatan)
             </option>
           </select>
+
           {errors.product && (
             <p className="field-error" id="product-error">
               {errors.product}
@@ -211,6 +224,7 @@ export function RequestForm() {
           <label htmlFor="quantity">
             Jumlah <span aria-hidden="true">*</span>
           </label>
+
           <input
             aria-describedby={
               errors.quantity ? "quantity-error" : undefined
@@ -223,6 +237,7 @@ export function RequestForm() {
             type="number"
             value={values.quantity}
           />
+
           {errors.quantity && (
             <p className="field-error" id="quantity-error">
               {errors.quantity}
@@ -235,6 +250,7 @@ export function RequestForm() {
             Kota tujuan pengiriman{" "}
             <span aria-hidden="true">*</span>
           </label>
+
           <input
             aria-describedby={
               errors.destination ? "destination-error" : undefined
@@ -249,6 +265,7 @@ export function RequestForm() {
             required
             value={values.destination}
           />
+
           {errors.destination && (
             <p className="field-error" id="destination-error">
               {errors.destination}
@@ -265,6 +282,7 @@ export function RequestForm() {
                 : "(opsional)"}
             </span>
           </label>
+
           <textarea
             aria-describedby={errors.notes ? "notes-error" : undefined}
             aria-invalid={Boolean(errors.notes)}
@@ -275,6 +293,7 @@ export function RequestForm() {
             rows={4}
             value={values.notes}
           />
+
           {errors.notes && (
             <p className="field-error" id="notes-error">
               {errors.notes}
@@ -308,8 +327,8 @@ export function RequestForm() {
 
       {orderResponse && (
         <p id="form-success" role="status">
-        <strong>✓ Permintaan berhasil disimpan!</strong>{" "}
-        Pesanan untuk {orderResponse.order.customerName} telah diterima.
+          <strong>✓ Permintaan berhasil disimpan!</strong>{" "}
+          Pesanan untuk {orderResponse.order.customerName} telah diterima.
         </p>
       )}
 
