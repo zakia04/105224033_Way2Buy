@@ -1,19 +1,37 @@
+import { Suspense } from "react";
 import { notFound } from "next/navigation";
+import { DatabaseUnavailable } from "@/components/features/system/DatabaseUnavailable";
 import { ProductDetail } from "../../../components/features/products/ProductDetail";
-import { products } from "../../../lib/catalog/products";
 import { getProductById } from "../../../lib/data";
+import { getPrismaDatabaseError } from "@/lib/prisma-database-error";
 
 interface ProductRouteProps {
   params: Promise<{ id: string }>;
 }
 
-export function generateStaticParams() {
-  return products.map((product) => ({ id: product.id }));
+export default function ProductRoute(props: ProductRouteProps) {
+  return (
+    <Suspense fallback={<p>Memuat detail produk...</p>}>
+      <ProductData {...props} />
+    </Suspense>
+  );
 }
 
-export default async function ProductRoute({ params }: ProductRouteProps) {
+async function ProductData({ params }: ProductRouteProps) {
   const { id } = await params;
-  const product = getProductById(id);
+  let product: Awaited<ReturnType<typeof getProductById>>;
+
+  try {
+    product = await getProductById(id);
+  } catch (error: unknown) {
+    const databaseError = getPrismaDatabaseError(error);
+    if (!databaseError) {
+      throw error;
+    }
+
+    console.error("Gagal memuat detail produk:", databaseError.code);
+    return <DatabaseUnavailable {...databaseError} />;
+  }
 
   if (!product) {
     notFound();

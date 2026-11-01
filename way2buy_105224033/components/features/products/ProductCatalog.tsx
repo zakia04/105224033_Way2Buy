@@ -1,10 +1,10 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { categories, products } from "../../../lib/catalog/products";
+import { categories, type Product } from "../../../lib/catalog/products";
 import { ProductCard } from "./ProductCard";
 
-export function ProductCatalog() {
+export function ProductCatalog({ products }: { products: Product[] }) {
   const [query, setQuery] = useState("");
   const [category, setCategory] =
     useState<(typeof categories)[number]>("Semua");
@@ -19,7 +19,7 @@ export function ProductCatalog() {
         matchesQuery && (category === "Semua" || product.category === category)
       );
     });
-  }, [category, query]);
+  }, [category, products, query]);
 
   return (
     <>

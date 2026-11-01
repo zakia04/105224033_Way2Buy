@@ -1,8 +1,9 @@
 import { ProductCatalog } from "./ProductCatalog";
 import { SiteFooter } from "../../layout/SiteFooter";
 import { SiteHeader } from "../../layout/SiteHeader";
+import type { Product } from "../../../lib/catalog/products";
 
-export function ProductsPage() {
+export function ProductsPage({ products }: { products: Product[] }) {
   return (
     <>
       <a className="skip-link" href="#main-content">
@@ -26,7 +27,7 @@ export function ProductsPage() {
           aria-labelledby="product-list-heading"
           className="catalog-section"
         >
-          <ProductCatalog />
+          <ProductCatalog products={products} />
         </section>
       </main>
       <SiteFooter />

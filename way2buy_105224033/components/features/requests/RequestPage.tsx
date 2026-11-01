@@ -2,8 +2,9 @@ import Link from "next/link";
 import { RequestForm } from "./RequestForm";
 import { SiteFooter } from "../../layout/SiteFooter";
 import { SiteHeader } from "../../layout/SiteHeader";
+import type { Product } from "../../../lib/catalog/products";
 
-export function RequestPage() {
+export function RequestPage({ products }: { products: Product[] }) {
   return (
     <>
       <a className="skip-link" href="#main-content">
@@ -42,7 +43,7 @@ export function RequestPage() {
                 Lengkapi detail berikut agar jastiper tahu yang kamu butuhkan.
               </p>
             </div>
-            <RequestForm />
+            <RequestForm products={products} />
           </section>
         </div>
       </main>

@@ -1,9 +1,7 @@
-export type ProductCategory = "Makanan" | "Fashion" | "Minuman" | "Oleh-oleh";
-
 export interface Product {
   id: string;
   name: string;
-  category: ProductCategory;
+  category: string;
   origin: string;
   price: number;
   rating: number;
