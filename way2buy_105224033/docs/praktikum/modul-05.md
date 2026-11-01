@@ -10,7 +10,7 @@ browser dan Route Handler memvalidasi ulang data yang diterima server.
 | Nama lengkap (`name`) | String di-trim, minimal 2 karakter. | `Nama minimal terdiri dari 2 karakter.` |
 | Email (`email`) | String di-trim dan harus berformat email. | `Masukkan alamat email yang valid, misalnya nama@email.com.` |
 | Nomor WhatsApp (`phone`) | Hanya angka, `+`, tanda kurung, tanda hubung, atau spasi; setelah karakter nonangka dibuang, jumlah digit harus 9–16. | `Masukkan nomor WhatsApp yang valid.` atau `Masukkan nomor WhatsApp yang valid (9–16 digit).` |
-| Produk (`product`) | Wajib dipilih; nilainya harus `custom` atau ID yang ada di katalog. | `Pilih produk yang ingin dititipkan.` atau `Produk yang dipilih tidak tersedia.` |
+| Produk (`product`) | Wajib dipilih; nilainya harus `custom` atau berformat ID katalog (`P` diikuti minimal 3 digit). Server memastikan ID tersebut ada di database. | `Pilih produk yang ingin dititipkan.` atau `Produk yang dipilih tidak tersedia.` |
 | Jumlah (`quantity`) | String bilangan bulat; harus berupa safe integer dan nilainya minimal 1. | `Jumlah harus berupa bilangan bulat.` atau `Jumlah minimal 1.` |
 | Kota tujuan (`destination`) | String di-trim, minimal 3 karakter. | `Masukkan kota tujuan pengiriman.` |
 | Catatan (`notes`) | String; opsional untuk produk katalog. Jika produk `custom`, hasil trim harus minimal 4 karakter. | Untuk produk `custom`: `Jelaskan produk yang ingin dititipkan (minimal 4 karakter).` |
@@ -22,7 +22,7 @@ di sebuah Server Action:
 
 | Aturan | Alasan |
 | --- | --- |
-| Produk harus `custom` atau ID produk yang benar-benar ada di katalog. | Nilai pilihan dari browser dapat diubah; server tidak boleh menerima produk yang tidak tersedia. |
+| Produk harus `custom` atau ID dengan format katalog; server memeriksa keberadaan produk di database. | Nilai pilihan dari browser dapat diubah; server tidak boleh menerima produk yang tidak tersedia. |
 | Produk `custom` harus memiliki catatan minimal 4 karakter setelah trim. | Server perlu menerima deskripsi yang cukup untuk mengidentifikasi produk di luar katalog. |
 | Jumlah harus integer aman dan minimal 1. | Mencegah jumlah nol, negatif, pecahan, atau nilai di luar rentang integer aman. |
 
@@ -86,7 +86,7 @@ tabel ini berasal dari pengujian tersebut.
 | 6 | Kota tujuan `NY`. | Zod | Ditolak; minimal 3 karakter. | Ditolak: `Masukkan kota tujuan pengiriman.` |
 | 7 | Produk `custom`, catatan `abc`. | Zod | Ditolak; catatan produk custom minimal 4 karakter. | Ditolak: `Jelaskan produk yang ingin dititipkan (minimal 4 karakter).` |
 | 8 | **Bypass formulir:** nama `A`, data dikirim langsung ke handler API. | `POST /api/orders` | HTTP 400; validasi server menolak nama. | HTTP 400; pesan nama minimal 2 karakter. |
-| 9 | **Bypass formulir:** produk `P999`, data dikirim langsung ke handler API. | `POST /api/orders` | HTTP 400; produk yang tidak ada ditolak. | HTTP 400; `Produk yang dipilih tidak tersedia.` |
+| 9 | **Bypass formulir:** produk `P999`, data dikirim langsung ke handler API. | `POST /api/orders` | Produk yang tidak ada ditolak server. | Belum dapat diulang setelah integrasi database: lookup `P999` akan menghasilkan HTTP 404 jika ID tidak ada; database saat ini menolak autentikasi (`P1000`). |
 | 10 | **Bypass formulir:** produk `custom`, catatan `abc`, data dikirim langsung ke handler API. | `POST /api/orders` | HTTP 400; aturan custom tetap berlaku di server. | HTTP 400; catatan produk custom minimal 4 karakter. |
 
 `noValidate` menonaktifkan validasi HTML bawaan browser, bukan handler Zod
@@ -194,4 +194,3 @@ tanpa melewati halaman atau proxy yang ditujukan untuk navigasi.
   pesan sesuai skema.
 - `POST` handler dipanggil langsung dengan tiga payload yang melewati formulir:
   semuanya menghasilkan HTTP 400 dengan issue yang sesuai.
-

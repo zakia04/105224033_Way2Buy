@@ -3,7 +3,7 @@ import { ProductCard } from "../products/ProductCard";
 import { ProductArtwork } from "../products/ProductArtwork";
 import { SiteFooter } from "../../layout/SiteFooter";
 import { SiteHeader } from "../../layout/SiteHeader";
-import { products } from "../../../lib/catalog/products";
+import type { Product } from "../../../lib/catalog/products";
 
 const benefits = [
   {
@@ -24,7 +24,9 @@ const benefits = [
   },
 ];
 
-export function HomePage() {
+export function HomePage({ products }: { products: Product[] }) {
+  const heroProduct = products[1] ?? products[0];
+
   return (
     <>
       <a className="skip-link" href="#main-content">
@@ -70,7 +72,12 @@ export function HomePage() {
             </div>
             <div className="hero__art">
               <div className="hero__sun" />
-              <ProductArtwork className="hero__photo" product={products[1]} />
+              {heroProduct && (
+                <ProductArtwork
+                  className="hero__photo"
+                  product={heroProduct}
+                />
+              )}
               <div className="hero-note hero-note--top">
                 <span aria-hidden="true">📍</span>
                 <span>

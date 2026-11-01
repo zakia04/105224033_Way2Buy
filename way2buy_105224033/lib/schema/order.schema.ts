@@ -1,5 +1,4 @@
 import { z } from "zod";
-import { products } from "@/lib/catalog/products";
 
 export const orderSchema = z
   .object({
@@ -23,8 +22,7 @@ export const orderSchema = z
       .string()
       .min(1, "Pilih produk yang ingin dititipkan.")
       .refine(
-        (value) =>
-          value === "custom" || products.some((product) => product.id === value),
+        (value) => value === "custom" || /^P\d{3,}$/.test(value),
         "Produk yang dipilih tidak tersedia.",
       ),
     quantity: z

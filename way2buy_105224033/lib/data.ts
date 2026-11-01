@@ -1,11 +1,12 @@
 import "server-only";
 
-import { products, type Product } from "./catalog/products";
+import { prisma } from "./prisma";
+import type { Product } from "./catalog/products";
 
-export function getProductById(id: string): Product | null {
-  if (!/^P\d{3}$/.test(id)) {
+export async function getProductById(id: string): Promise<Product | null> {
+  if (!/^P\d{3,}$/.test(id)) {
     return null;
   }
 
-  return products.find((product) => product.id === id) ?? null;
+  return prisma.product.findUnique({ where: { id } });
 }
