@@ -1,6 +1,12 @@
 
 "use client";
 
+import {
+  createProduct,
+  updateProduct,
+  deleteProduct as deleteProductAction,
+} from "@/app/actions/product";
+
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import type { FormEvent } from "react";
@@ -151,95 +157,71 @@ export function ProductAdmin() {
   }
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
+  event.preventDefault();
 
-    setError(null);
-    setNotice(null);
-    setSaving(true);
+  setError(null);
+  setNotice(null);
+  setSaving(true);
 
-    try {
-      const response = await fetch("/api/products", {
-        method: editing ? "PATCH" : "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          ...form,
-          price: Number(form.price),
-          rating: Number(form.rating),
-        }),
-      });
+  try {
+    const input = {
+      ...form,
+      price: Number(form.price),
+      rating: Number(form.rating),
+    };
 
-      const data: unknown = await response.json();
+    const result = editing
+      ? await updateProduct(token, input)
+      : await createProduct(token, input);
 
-      if (!response.ok) {
-        throw new Error(
-          responseError(data) ?? "Perubahan produk gagal.",
-        );
-      }
+    if (!result.success) {
+      throw new Error(result.message);
+    }
 
-      setNotice(
-        editing
-          ? "Produk berhasil diperbarui."
-          : "Produk berhasil ditambahkan.",
-      );
+    setNotice(result.message);
+    resetForm();
+    await refreshProducts();
+  } catch (caught: unknown) {
+    setError(
+      caught instanceof Error
+        ? caught.message
+        : "Perubahan produk gagal.",
+    );
+  } finally {
+    setSaving(false);
+  }
+}
 
+ async function deleteProduct(id: string) {
+  if (!window.confirm(`Hapus produk ${id}?`)) {
+    return;
+  }
+
+  setError(null);
+  setNotice(null);
+
+  try {
+    const result = await deleteProductAction(token, id);
+
+    if (!result.success) {
+      throw new Error(result.message);
+    }
+
+    setNotice(result.message);
+
+    if (form.id === id) {
       resetForm();
-      await refreshProducts();
-    } catch (caught: unknown) {
-      setError(
-        caught instanceof Error
-          ? caught.message
-          : "Perubahan produk gagal.",
-      );
-    } finally {
-      setSaving(false);
     }
+
+    await refreshProducts();
+  } catch (caught: unknown) {
+    setError(
+      caught instanceof Error
+        ? caught.message
+        : "Produk gagal dihapus.",
+    );
   }
-
-  async function deleteProduct(id: string) {
-    if (!window.confirm(`Hapus produk ${id}?`)) {
-      return;
-    }
-
-    setError(null);
-    setNotice(null);
-
-    try {
-      const response = await fetch(
-        `/api/products?id=${encodeURIComponent(id)}`,
-        {
-          method: "DELETE",
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        },
-      );
-
-      const data: unknown = await response.json();
-
-      if (!response.ok) {
-        throw new Error(
-          responseError(data) ?? "Produk gagal dihapus.",
-        );
-      }
-
-      setNotice("Produk berhasil dihapus.");
-
-      if (form.id === id) {
-        resetForm();
-      }
-
-      await refreshProducts();
-    } catch (caught: unknown) {
-      setError(
-        caught instanceof Error
-          ? caught.message
-          : "Produk gagal dihapus.",
-      );
-    }
-  }
+}
 
   const averageRating =
     products.length > 0
