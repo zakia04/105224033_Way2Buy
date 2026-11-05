@@ -327,14 +327,181 @@ Panduan alur demonstrasi individual pada pertemuan pekan 3:
 
 ---
 
-## BAGIAN III: CARA MENJALANKAN APLIKASI & PENGUJIAN
+## BAGIAN III: INTEGRASI LOGIKA SERVER DAN DATABASE (MILESTONE 2)
 
-### 3.1 Prasyarat
+### 3.1 Teknologi yang Digunakan
+
+Pengembangan Milestone 2 menggunakan teknologi berikut:
+
+- **Next.js 16.4.0** sebagai framework aplikasi web.
+- **React 19.3.0** untuk membangun antarmuka pengguna.
+- **TypeScript** sebagai bahasa pemrograman.
+- **Tailwind CSS v4** untuk desain antarmuka.
+- **PostgreSQL** sebagai sistem manajemen basis data.
+- **Prisma ORM 7.10.1** untuk pengelolaan database.
+- **Zod 4.6.7** untuk validasi data.
+- **Server Actions** untuk menangani proses pengelolaan data di sisi server.
+
+### 3.2 Perancangan Database
+
+Way2Buy menggunakan PostgreSQL dengan Prisma ORM 7.10.1. Database memiliki dua entitas utama, yaitu `Product` dan `Order`.
+
+**Entitas Product**
+
+Menyimpan informasi produk lokal yang tersedia pada platform Way2Buy.
+
+Atribut utama:
+- `id`: Identitas produk.
+- `name`: Nama produk.
+- `category`: Kategori produk.
+- `origin`: Daerah asal produk.
+- `price`: Harga produk.
+- `rating`: Penilaian produk.
+- `illustration`: Ilustrasi produk.
+- `description`: Deskripsi produk.
+- `createdAt`: Waktu pembuatan data.
+- `updatedAt`: Waktu pembaruan data.
+
+**Entitas Order**
+
+Menyimpan informasi permintaan jasa titip dari konsumen.
+
+Atribut utama:
+- `id`: Identitas pesanan.
+- `customerName`: Nama pelanggan.
+- `email`: Email pelanggan.
+- `phone`: Nomor WhatsApp pelanggan.
+- `productName`: Nama produk yang dipesan.
+- `productId`: Relasi ke entitas Product.
+- `quantity`: Jumlah produk.
+- `notes`: Catatan pesanan.
+- `destinationCiphertext`: Alamat tujuan terenkripsi.
+- `destinationIv`: Initialization Vector.
+- `destinationAuthTag`: Authentication Tag.
+- `status`: Status pesanan.
+- `createdAt`: Waktu pembuatan pesanan.
+- `updatedAt`: Waktu pembaruan pesanan.
+
+Kedua entitas memiliki relasi satu-ke-banyak (one-to-many), yaitu satu produk dapat memiliki beberapa pesanan. Relasi tersebut menggunakan `productId` sebagai foreign key dengan aturan `onDelete: Restrict`.
+
+File skema database tersedia pada `prisma/schema.prisma`.
+
+### 3.3 Implementasi Server Actions
+
+Server Actions digunakan untuk menangani operasi pengelolaan data secara langsung di sisi server.
+
+**Product Server Actions**
+
+File: `app/actions/product.ts`
+
+Fungsi yang tersedia:
+- Create Product: Menambahkan produk baru.
+- Update Product: Memperbarui informasi produk.
+- Delete Product: Menghapus produk.
+
+Pengelolaan produk dilakukan melalui antarmuka admin Way2Buy.
+
+**Order Server Actions**
+
+File: `app/actions/order.ts`
+
+Fungsi yang tersedia:
+- Create Order: Membuat pesanan baru.
+- Validasi data pesanan menggunakan Zod.
+- Memeriksa keberadaan produk melalui Prisma.
+- Mengenkripsi alamat tujuan menggunakan AES-256-GCM.
+- Menyimpan data pesanan ke PostgreSQL.
+
+Formulir permintaan titip pada `components/features/requests/RequestForm.tsx` telah diintegrasikan dengan fungsi `createOrder()`.
+
+Pengelolaan daftar pesanan, perubahan status, dan penghapusan pesanan juga tersedia melalui antarmuka admin.
+
+### 3.4 Validasi Sisi Server
+
+Validasi data menggunakan Zod melalui schema yang tersedia pada `lib/schema/order.schema.ts`.
+
+Validasi dilakukan sebelum data diproses atau disimpan ke database.
+
+Validasi mencakup:
+- Nama pelanggan.
+- Format alamat email.
+- Nomor WhatsApp.
+- Pilihan produk.
+- Jumlah barang.
+- Kota tujuan atau alamat pengiriman.
+- Catatan khusus.
+
+Apabila masukan tidak memenuhi ketentuan, sistem menolak pemrosesan data dan mengembalikan pesan kesalahan untuk ditampilkan pada formulir.
+
+### 3.5 Migration dan Seed Data
+
+Struktur database dikelola menggunakan Prisma Migration.
+
+Lokasi file:
+- `prisma/schema.prisma`
+- `prisma/migrations/`
+- `prisma/seed.ts`
+- `prisma7.config.ts`
+
+Seed menggunakan data sintetis dari katalog produk Way2Buy. Proses seeding menggunakan operasi `upsert` untuk menyinkronkan data produk berdasarkan ID.
+
+Perintah yang digunakan:
+
+```bash
+npm run db:generate
+npx prisma migrate status
+npm run db:seed
+```
+
+Hasil pengujian:
+- Prisma Schema berhasil divalidasi.
+- Prisma Client 7.10.1 berhasil dibuat.
+- Migration database berstatus up to date.
+- Seed berhasil menyinkronkan enam produk.
+
+### 3.6 Hasil Pengujian Milestone 2
+
+Pengujian dilakukan terhadap fungsi CRUD, relasi database, validasi, dan proses integrasi aplikasi.
+
+| No. | Skenario Pengujian | Hasil |
+|---|---|---|
+| 1 | Menambahkan produk | Berhasil |
+| 2 | Melihat daftar produk | Berhasil |
+| 3 | Memperbarui produk | Berhasil |
+| 4 | Menghapus produk | Berhasil |
+| 5 | Membuat pesanan | Berhasil |
+| 6 | Melihat daftar pesanan | Berhasil |
+| 7 | Memperbarui status pesanan | Berhasil |
+| 8 | Menghapus pesanan | Berhasil |
+| 9 | Memeriksa relasi Product dan Order | Perlu verifikasi |
+| 10 | Menguji proteksi penghapusan produk yang masih memiliki pesanan | Perlu verifikasi |
+
+**Hasil pengujian teknis:**
+
+| Pengujian | Hasil |
+|---|---|
+| Prisma Validate | Lulus |
+| Prisma Generate | Lulus |
+| Prisma Migration Status | Lulus |
+| Prisma Seed | Lulus |
+| ESLint | Lulus |
+| TypeScript Check | Lulus |
+| Production Build | Lulus |
+| Pengiriman pesanan valid | Lulus |
+| Validasi input formulir | Lulus |
+
+Pengujian otomatis pada `tests/crypto.test.ts` menghasilkan 13 pengujian berhasil. Pengujian tersebut berfokus pada modul kriptografi dan bukan pengujian integrasi otomatis CRUD.
+
+**Catatan:** Pengujian relasi dan tiga skenario penolakan validasi secara langsung pada Server Actions masih perlu diverifikasi sebelum dinyatakan lulus.
+
+## BAGIAN IV: CARA MENJALANKAN APLIKASI & PENGUJIAN
+
+### 4.1 Prasyarat
 
 - **Node.js** versi ≥ 18.x (direkomendasikan Node.js v20+)
 - **npm** versi ≥ 9.x
 
-### 3.2 Instalasi Dependensi
+### 4.2 Instalasi Dependensi
 
 Jalankan perintah berikut di dalam direktori `way2buy`:
 
@@ -342,7 +509,7 @@ Jalankan perintah berikut di dalam direktori `way2buy`:
 npm install
 ```
 
-### 3.3 Menyiapkan Variabel Lingkungan
+### 4.3 Menyiapkan Variabel Lingkungan
 
 Bangkitkan kunci enkripsi acak 32-byte (Base64) menggunakan CSPRNG:
 
@@ -362,13 +529,13 @@ Buka file `.env.local` dan masukkan kunci yang baru dibangkitkan:
 WAY2BUY_ENCRYPTION_KEY=PASTE_KUNCI_BASE64_HASIL_PERINTAH_DI_ATAS
 ```
 
-### 3.4 Menjalankan Pengujian Otomatis
+### 4.4 Menjalankan Pengujian Otomatis
 
 ```bash
 npm test
 ```
 
-### 3.5 Menjalankan Aplikasi Web
+### 4.5 Menjalankan Aplikasi Web
 
 ```bash
 npm run dev
@@ -382,7 +549,7 @@ Buka peramban (_browser_) pada alamat:
 
 ---
 
-## BAGIAN IV: BUKTI PENGERJAAN (EVIDENCE)
+## BAGIAN V: BUKTI PENGERJAAN (EVIDENCE)
 
 | Jenis Bukti                          | File Bukti                                                       | Keterangan                                                |
 | ------------------------------------ | ---------------------------------------------------------------- | --------------------------------------------------------- |
@@ -404,3 +571,36 @@ Buka peramban (_browser_) pada alamat:
   git push origin v0.1
   ```
 - **Catatan Pengumpulan:** Tautan repositori GitHub dan tag `v0.1` diserahkan melalui kolom teks daring sesuai instruksi. Komit yang dinilai adalah komit yang ditunjuk oleh tag `v0.1`.
+
+## BAGIAN V: INFORMASI RILIS DAN PENGUMPULAN (TAG v0.2)
+
+### Versi Produk
+
+- **Versi sebelumnya:** `v0.1` — Milestone 1: Pengembangan antarmuka web dan komponen kriptografi dasar.
+- **Versi saat ini:** `v0.2` — Milestone 2: Integrasi logika server dan database produk web.
+
+### Ringkasan Pembaruan v0.2
+
+1. Implementasi Product Server Actions.
+2. Implementasi Order Server Actions.
+3. Integrasi PostgreSQL menggunakan Prisma ORM 7.10.1.
+4. Implementasi relasi database Product dan Order.
+5. Implementasi validasi sisi server menggunakan Zod.
+6. Implementasi migration dan seed data sintetis.
+7. Integrasi penyimpanan pesanan secara persisten.
+8. Integrasi enkripsi alamat tujuan menggunakan AES-256-GCM.
+
+### Perintah Pembuatan Tag
+
+Setelah seluruh perubahan selesai di-commit dan di-push ke branch `main`, jalankan:
+
+```bash
+git tag -a v0.2 -m "Release v0.2: Milestone 2 Server and Database Integration"
+git push origin v0.2
+```
+
+Tag `v0.1` tetap dipertahankan sebagai versi Milestone 1.
+
+### Catatan Pengumpulan
+
+Repository GitHub dan tag `v0.2` digunakan sebagai bukti pengumpulan Milestone 2 melalui Moodle.

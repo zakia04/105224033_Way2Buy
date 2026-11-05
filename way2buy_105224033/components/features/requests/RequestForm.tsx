@@ -1,8 +1,10 @@
+
 "use client";
 
 import { FormEvent, useState } from "react";
 import type { Product } from "../../../lib/catalog/products";
 import { orderSchema } from "@/lib/schema/order.schema";
+import { createOrder } from "@/app/actions/order";
 
 interface RequestFormProps {
   products: Product[];
@@ -20,15 +22,8 @@ interface FormValues {
 
 interface OrderResponse {
   success: boolean;
-  orderId: string;
+  orderId?: string;
   message: string;
-  order: {
-    orderId: string;
-    customerName: string;
-    product: string;
-    quantity: number;
-    createdAt: string;
-  };
 }
 
 type FormErrors = Partial<Record<keyof FormValues, string>>;
@@ -87,26 +82,36 @@ export function RequestForm({ products }: RequestFormProps) {
     setIsSubmitting(true);
 
     try {
-      const res = await fetch("/api/orders", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(validation.data),
-      });
+      const data = await createOrder(validation.data);
 
-      const data = await res.json();
+      if (!data.success) {
+        if (data.errors) {
+          const nextErrors: FormErrors = {};
 
-      if (!res.ok) {
-        throw new Error(
-          data.error || "Gagal memproses pesanan di server."
-        );
+          for (const [field, messages] of Object.entries(data.errors)) {
+            if (field in values && messages?.[0]) {
+              nextErrors[field as keyof FormValues] = messages[0];
+            }
+          }
+
+          setErrors(nextErrors);
+        }
+
+        throw new Error(data.message);
       }
 
-      setOrderResponse(data);
+      setOrderResponse({
+        success: true,
+        orderId: data.orderId,
+        message: data.message,
+      });
+
+      setValues(initialValues);
     } catch (err: unknown) {
       setServerError(
         err instanceof Error
           ? err.message
-          : "Terjadi kesalahan saat memproses data ke server."
+          : "Terjadi kesalahan saat memproses pesanan."
       );
     } finally {
       setIsSubmitting(false);
@@ -328,7 +333,7 @@ export function RequestForm({ products }: RequestFormProps) {
       {orderResponse && (
         <p id="form-success" role="status">
           <strong>✓ Permintaan berhasil disimpan!</strong>{" "}
-          Pesanan untuk {orderResponse.order.customerName} telah diterima.
+          Nomor pesanan: {orderResponse.orderId}
         </p>
       )}
 
