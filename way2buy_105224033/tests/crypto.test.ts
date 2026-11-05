@@ -239,3 +239,75 @@ describe("Skenario 8 — Dua enkripsi menghasilkan IV berbeda", () => {
     assert.equal(decrypted2, ALAMAT_SINTETIS);
   });
 });
+
+// ==================================================
+// Skenario 9: Kunci enkripsi yang salah ditolak
+// ==================================================
+describe("Skenario 9 — Kunci enkripsi salah", () => {
+  it("harus menolak dekripsi menggunakan kunci berbeda", () => {
+    const encrypted = encryptAddress(ALAMAT_SINTETIS, TEST_KEY);
+    const wrongKey = randomBytes(32).toString("base64");
+
+    assert.throws(
+      () => decryptAddress(encrypted, wrongKey),
+      "Dekripsi harus gagal jika menggunakan kunci yang salah",
+    );
+  });
+});
+
+// ==================================================
+// Skenario 10: IV dengan panjang tidak valid ditolak
+// ==================================================
+describe("Skenario 10 — IV tidak valid", () => {
+  it("harus menolak IV yang bukan 12 byte", () => {
+    const encrypted = encryptAddress(ALAMAT_SINTETIS, TEST_KEY);
+
+    const invalidData: EncryptedData = {
+      ...encrypted,
+      iv: randomBytes(8).toString("base64"),
+    };
+
+    assert.throws(
+      () => decryptAddress(invalidData, TEST_KEY),
+      { message: /Panjang IV tidak valid/ },
+    );
+  });
+});
+
+// ==================================================
+// Skenario 11: Authentication tag dengan panjang salah
+// ==================================================
+describe("Skenario 11 — Panjang authentication tag tidak valid", () => {
+  it("harus menolak authentication tag yang bukan 16 byte", () => {
+    const encrypted = encryptAddress(ALAMAT_SINTETIS, TEST_KEY);
+
+    const invalidData: EncryptedData = {
+      ...encrypted,
+      authTag: randomBytes(8).toString("base64"),
+    };
+
+    assert.throws(
+      () => decryptAddress(invalidData, TEST_KEY),
+      { message: /Panjang authentication tag tidak valid/ },
+    );
+  });
+});
+
+// ==================================================
+// Skenario 12: Format Base64 tidak valid
+// ==================================================
+describe("Skenario 12 — Format Base64 tidak valid", () => {
+  it("harus menolak ciphertext dengan format Base64 yang salah", () => {
+    const encrypted = encryptAddress(ALAMAT_SINTETIS, TEST_KEY);
+
+    const invalidData: EncryptedData = {
+      ...encrypted,
+      ciphertext: "%%%INVALID_BASE64%%%",
+    };
+
+    assert.throws(
+      () => decryptAddress(invalidData, TEST_KEY),
+      { message: /Format Base64 ciphertext tidak valid/ },
+    );
+  });
+});

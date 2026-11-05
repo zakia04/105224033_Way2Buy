@@ -1,86 +1,86 @@
+
 /**
  * lib/crypto.ts
  *
- * Komponen kriptografi Way2Buy — enkripsi dan dekripsi alamat pengiriman
- * menggunakan AES-256-GCM melalui modul bawaan Node.js (node:crypto).
+ * Enkripsi dan dekripsi alamat pengiriman Way2Buy
+ * menggunakan AES-256-GCM melalui node:crypto.
  *
- * Komponen ini berjalan di sisi server (server-side).
- * Kunci enkripsi dibaca dari variabel lingkungan WAY2BUY_ENCRYPTION_KEY.
+ * Kunci dibaca dari WAY2BUY_ENCRYPTION_KEY.
+ * Implementasi berjalan di sisi server.
  *
- * Parameter kriptografi:
- * - Algoritma   : aes-256-gcm (Authenticated Encryption with Associated Data)
- * - Panjang kunci: 256 bit (32 byte)
- * - Panjang IV   : 96 bit (12 byte) — sesuai rekomendasi NIST SP 800-38D
- * - Auth tag     : 128 bit (16 byte)
- * - Sumber acak  : CSPRNG sistem operasi via crypto.randomBytes()
- * - Representasi : Base64 untuk ciphertext, IV, dan auth tag
- *
- * Keterkaitan Aset & Keamanan:
- * - Aset Inventori : D-05 (Data Pesanan — Alamat Pengiriman Konsumen)
- * - Aspek CIA      : Kerahasiaan (Confidentiality) & Integritas (Integrity)
- * - Mitigasi Ancaman: T-03 (Tampering pesanan), T-09 (Akses langsung basis data), T-10 (Kebocoran cadangan data)
+ * Parameter:
+ * - Algoritma: AES-256-GCM
+ * - Kunci: 256 bit (32 byte)
+ * - IV: 96 bit (12 byte), dibuat menggunakan CSPRNG
+ * - Authentication tag: 128 bit (16 byte)
+ * - Encoding: Base64
+ * - AAD: Tidak digunakan untuk menjaga kompatibilitas
+ *   dengan data terenkripsi yang sudah tersimpan.
  */
 
-import { createCipheriv, createDecipheriv, randomBytes } from "node:crypto";
-
-// ─────────────────────────────────────────────
-// Konstanta Kriptografi
-// ─────────────────────────────────────────────
+import {
+  createCipheriv,
+  createDecipheriv,
+  randomBytes,
+} from "node:crypto";
 
 export const CRYPTO_CONFIG = {
   ALGORITHM: "aes-256-gcm" as const,
-  KEY_LENGTH: 32, // 256 bit
-  IV_LENGTH: 12, // 96 bit (NIST SP 800-38D)
-  AUTH_TAG_LENGTH: 16, // 128 bit
-  MAX_ADDRESS_LENGTH: 500, // Batas panjang alamat (karakter)
+  KEY_LENGTH: 32,
+  IV_LENGTH: 12,
+  AUTH_TAG_LENGTH: 16,
+  MAX_ADDRESS_LENGTH: 500,
 };
 
-// ─────────────────────────────────────────────
-// Representasi Data (Tipe Data)
-// ─────────────────────────────────────────────
-
-/**
- * Hasil enkripsi yang berisi ciphertext, IV, dan authentication tag.
- * Seluruh nilai dikodekan dalam representasi string Base64.
- */
 export interface EncryptedData {
-  /** Ciphertext dalam representasi Base64 */
   ciphertext: string;
-  /** Initialization vector (12 byte) dalam representasi Base64 */
   iv: string;
-  /** Authentication tag (16 byte) dalam representasi Base64 */
   authTag: string;
 }
 
-// ─────────────────────────────────────────────
-// Fungsi Pembantu & Validasi
-// ─────────────────────────────────────────────
+/**
+ * Memvalidasi dan mengubah Base64 menjadi Buffer.
+ * Hanya menerima format Base64 standar yang valid.
+ */
+function decodeBase64(value: unknown, fieldName: string): Buffer {
+  if (
+    typeof value !== "string" ||
+    value.length === 0 ||
+    !/^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$/.test(
+      value,
+    )
+  ) {
+    throw new Error(`Format Base64 ${fieldName} tidak valid.`);
+  }
+
+  const decoded = Buffer.from(value, "base64");
+
+  // Memastikan representasi Base64 bersifat kanonis.
+  if (decoded.toString("base64") !== value) {
+    throw new Error(`Format Base64 ${fieldName} tidak valid.`);
+  }
+
+  return decoded;
+}
 
 /**
- * Membaca kunci enkripsi dari variabel lingkungan WAY2BUY_ENCRYPTION_KEY
- * dan mengembalikannya sebagai Buffer 32 byte.
- *
- * @param envKey — Nilai kunci Base64 (opsional, untuk keperluan pengujian).
- *                 Jika tidak diberikan, membaca dari process.env.WAY2BUY_ENCRYPTION_KEY.
- * @throws Error jika kunci tidak ditemukan atau panjang tidak sama dengan 32 byte.
+ * Mengambil kunci enkripsi 256-bit dari environment
+ * atau parameter khusus pengujian.
  */
 export function getEncryptionKey(envKey?: string): Buffer {
   const raw = envKey ?? process.env.WAY2BUY_ENCRYPTION_KEY;
 
-  if (!raw || raw.trim().length === 0) {
+  if (typeof raw !== "string" || raw.trim().length === 0) {
     throw new Error(
-      "Kunci enkripsi tidak ditemukan. " +
-        "Pastikan variabel lingkungan WAY2BUY_ENCRYPTION_KEY sudah diisi.",
+      "Kunci enkripsi tidak ditemukan. Periksa WAY2BUY_ENCRYPTION_KEY.",
     );
   }
 
-  const keyBuffer = Buffer.from(raw.trim(), "base64");
+  const keyBuffer = decodeBase64(raw.trim(), "kunci enkripsi");
 
   if (keyBuffer.length !== CRYPTO_CONFIG.KEY_LENGTH) {
     throw new Error(
-      `Panjang kunci tidak valid: diharapkan ${CRYPTO_CONFIG.KEY_LENGTH} byte, ` +
-        `diterima ${keyBuffer.length} byte. ` +
-        "Pastikan kunci berupa string Base64 dari 32 byte acak.",
+      `Panjang kunci harus ${CRYPTO_CONFIG.KEY_LENGTH} byte (256 bit).`,
     );
   }
 
@@ -88,149 +88,129 @@ export function getEncryptionKey(envKey?: string): Buffer {
 }
 
 /**
- * Memvalidasi masukan alamat sebelum dilakukan proses enkripsi.
- *
- * Aturan validasi:
- * 1. Input harus bertipe string.
- * 2. Input tidak boleh kosong atau hanya berisi spasi.
- * 3. Panjang input tidak boleh melebihi MAX_ADDRESS_LENGTH karakter.
- *
- * @throws Error dengan pesan deskriptif jika validasi gagal.
+ * Memvalidasi alamat sebelum dienkripsi.
  */
 export function validateAddress(input: unknown): asserts input is string {
   if (typeof input !== "string") {
-    throw new Error(`Input harus berupa string, diterima: ${typeof input}.`);
+    throw new Error("Alamat harus berupa string.");
   }
 
   if (input.trim().length === 0) {
-    throw new Error("Alamat tidak boleh kosong atau hanya berisi spasi.");
+    throw new Error("Alamat tidak boleh kosong.");
   }
 
   if (input.length > CRYPTO_CONFIG.MAX_ADDRESS_LENGTH) {
-    throw new Error(
-      `Panjang alamat melebihi batas maksimum (${CRYPTO_CONFIG.MAX_ADDRESS_LENGTH} karakter). ` +
-        `Panjang saat ini: ${input.length} karakter.`,
+  throw new Error(
+    `Panjang alamat melebihi batas maksimum (${CRYPTO_CONFIG.MAX_ADDRESS_LENGTH} karakter).`,
     );
   }
 }
 
-// ─────────────────────────────────────────────
-// Fungsi Utama: Enkripsi & Dekripsi
-// ─────────────────────────────────────────────
-
 /**
- * Mengenkripsi alamat pengiriman menggunakan algoritma AES-256-GCM.
- *
- * Masukan:
- * - address: Alamat pengiriman (string)
- * - keyBase64 (opsional): Kunci 32 byte berformat Base64
- *
- * Proses:
- * 1. Validasi masukan alamat (tipe string, non-kosong, maks 500 karakter).
- * 2. Ambil kunci simetris 256-bit dari variabel lingkungan atau parameter.
- * 3. Bangkitkan IV acak 12 byte via CSPRNG `randomBytes(12)`.
- * 4. Inisialisasi cipher AES-256-GCM dan lakukan enkripsi plaintext.
- * 5. Ekstrak authentication tag 16 byte dari cipher.
- * 6. Encode ciphertext, IV, dan authentication tag ke format Base64.
- *
- * Keluaran:
- * - EncryptedData { ciphertext, iv, authTag }
- *
- * @param address — Alamat pengiriman yang akan dienkripsi.
- * @param keyBase64 — Kunci Base64 opsional (untuk unit testing).
- * @returns EncryptedData — Objek berisi ciphertext, iv, dan authTag.
+ * Mengenkripsi alamat menggunakan AES-256-GCM.
  */
 export function encryptAddress(
   address: string,
   keyBase64?: string,
 ): EncryptedData {
-  // 1. Validasi masukan
+  // 1. Validasi alamat.
   validateAddress(address);
 
-  // 2. Ambil kunci simetris
+  // 2. Ambil kunci 256-bit.
   const key = getEncryptionKey(keyBase64);
 
-  // 3. Bangkitkan IV acak via CSPRNG
+  // 3. Buat IV acak menggunakan CSPRNG.
   const iv = randomBytes(CRYPTO_CONFIG.IV_LENGTH);
 
-  // 4. Inisialisasi cipher AES-256-GCM dan enkripsi
-  const cipher = createCipheriv(CRYPTO_CONFIG.ALGORITHM, key, iv, {
-    authTagLength: CRYPTO_CONFIG.AUTH_TAG_LENGTH,
-  });
+  // 4. Inisialisasi AES-256-GCM.
+  const cipher = createCipheriv(
+    CRYPTO_CONFIG.ALGORITHM,
+    key,
+    iv,
+    {
+      authTagLength: CRYPTO_CONFIG.AUTH_TAG_LENGTH,
+    },
+  );
 
-  const encrypted = Buffer.concat([
+  // 5. Enkripsi plaintext.
+  const ciphertext = Buffer.concat([
     cipher.update(address, "utf8"),
     cipher.final(),
   ]);
 
-  // 5. Ambil authentication tag
+  // 6. Ambil authentication tag.
   const authTag = cipher.getAuthTag();
 
-  // 6. Kembalikan representasi Base64
+  // 7. Kembalikan seluruh komponen dalam Base64.
   return {
-    ciphertext: encrypted.toString("base64"),
+    ciphertext: ciphertext.toString("base64"),
     iv: iv.toString("base64"),
     authTag: authTag.toString("base64"),
   };
 }
 
 /**
- * Mendekripsi ciphertext kembali menjadi plaintext alamat pengiriman.
+ * Mendekripsi alamat dan memverifikasi integritasnya.
  *
- * Masukan:
- * - data: Objek EncryptedData { ciphertext, iv, authTag }
- * - keyBase64 (opsional): Kunci 32 byte berformat Base64
- *
- * Proses:
- * 1. Validasi kelengkapan parameter objek masukan.
- * 2. Ambil kunci simetris 256-bit.
- * 3. Decode ciphertext, IV, dan authentication tag dari format Base64 ke Buffer.
- * 4. Inisialisasi decipher AES-256-GCM dan atur authentication tag.
- * 5. Lakukan verifikasi integritas dan dekripsi data.
- *
- * Verifikasi Integritas:
- * Jika ciphertext diubah atau auth tag tidak sesuai, OpenSSL akan melempar
- * error autentikasi dan membatalkan proses dekripsi.
- *
- * Keluaran:
- * - Plaintext alamat (string UTF-8)
- *
- * @param data — Objek EncryptedData yang berisi ciphertext, iv, dan authTag.
- * @param keyBase64 — Kunci Base64 opsional (untuk unit testing).
- * @returns string — Alamat pengiriman plaintext.
+ * Jika ciphertext, IV, authentication tag, atau kunci
+ * tidak sesuai, proses akan dihentikan.
  */
 export function decryptAddress(
   data: EncryptedData,
   keyBase64?: string,
 ): string {
-  // 1. Validasi masukan
-  if (!data || typeof data !== "object") {
-    throw new Error(
-      "Parameter dekripsi tidak valid: objek EncryptedData diperlukan.",
-    );
+  // 1. Validasi objek masukan.
+  if (
+    !data ||
+    typeof data !== "object" ||
+    Array.isArray(data)
+  ) {
+    throw new Error("Objek EncryptedData tidak valid.");
   }
 
-  if (!data.ciphertext || !data.iv || !data.authTag) {
-    throw new Error(
-      "Data terenkripsi tidak lengkap: ciphertext, iv, dan authTag wajib ada.",
-    );
-  }
-
-  // 2. Ambil kunci simetris
+  // 2. Ambil kunci enkripsi.
   const key = getEncryptionKey(keyBase64);
 
-  // 3. Decode Base64 ke buffer
-  const ciphertextBuf = Buffer.from(data.ciphertext, "base64");
-  const ivBuf = Buffer.from(data.iv, "base64");
-  const authTagBuf = Buffer.from(data.authTag, "base64");
+  // 3. Decode seluruh komponen Base64.
+  const ciphertextBuf = decodeBase64(
+    data.ciphertext,
+    "ciphertext",
+  );
 
-  // 4. Inisialisasi decipher dan pasang auth tag
-  const decipher = createDecipheriv(CRYPTO_CONFIG.ALGORITHM, key, ivBuf, {
-    authTagLength: CRYPTO_CONFIG.AUTH_TAG_LENGTH,
-  });
+  const ivBuf = decodeBase64(data.iv, "IV");
+
+  const authTagBuf = decodeBase64(
+    data.authTag,
+    "authentication tag",
+  );
+
+  // 4. Validasi panjang setiap komponen.
+  if (ciphertextBuf.length === 0) {
+    throw new Error("Ciphertext tidak boleh kosong.");
+  }
+
+  if (ivBuf.length !== CRYPTO_CONFIG.IV_LENGTH) {
+    throw new Error("Panjang IV tidak valid.");
+  }
+
+  if (authTagBuf.length !== CRYPTO_CONFIG.AUTH_TAG_LENGTH) {
+    throw new Error("Panjang authentication tag tidak valid.");
+  }
+
+  // 5. Inisialisasi proses dekripsi.
+  const decipher = createDecipheriv(
+    CRYPTO_CONFIG.ALGORITHM,
+    key,
+    ivBuf,
+    {
+      authTagLength: CRYPTO_CONFIG.AUTH_TAG_LENGTH,
+    },
+  );
+
   decipher.setAuthTag(authTagBuf);
 
-  // 5. Dekripsi dan verifikasi keaslian (autentikasi)
+  // 6. Verifikasi autentikasi dan dekripsi.
+  // decipher.final() akan gagal jika autentikasi tidak valid.
   const decrypted = Buffer.concat([
     decipher.update(ciphertextBuf),
     decipher.final(),
