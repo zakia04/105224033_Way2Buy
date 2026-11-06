@@ -1,0 +1,16 @@
+RINGKASAN INITIAL IMAGE SCAN
+Image: way2buy_105224033-way2buy:latest
+OS: Alpine 3.24.3
+
+Hasil pemindaian awal sebelum pembaruan dependency:
+CRITICAL: 2
+HIGH: 11
+MEDIUM: 12
+LOW: 1
+TOTAL: 26
+
+Catatan:
+Dua temuan CRITICAL berkaitan dengan Next.js 16.4.0.
+Dependency Next.js kemudian diperbarui ke 16.4.1.
+Hasil ini merupakan ringkasan berdasarkan output pemindaian awal,
+bukan log mentah Trivy.

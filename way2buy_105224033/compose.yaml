@@ -1,0 +1,33 @@
+
+services:
+  way2buy:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: way2buy-app
+    restart: unless-stopped
+
+    ports:
+      - "127.0.0.1:3000:3000"
+
+    env_file:
+      - .env
+
+    environment:
+      NODE_ENV: production
+      PORT: 3000
+      HOSTNAME: 0.0.0.0
+
+    security_opt:
+      - no-new-privileges:true
+
+    cap_drop:
+      - ALL
+
+    read_only: true
+
+    tmpfs:
+      - /tmp:size=64M,mode=1777
+      - /app/.next/cache:size=64M,mode=1777
+
+    init: true
