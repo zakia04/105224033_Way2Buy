@@ -19,9 +19,10 @@ COPY . .
 # Generate Prisma Client
 RUN npm run db:generate
 
-# Dummy URL hanya untuk proses build Next.js
+# Dummy URL untuk proses build Next.js
 ENV DATABASE_URL="postgresql://build:build@127.0.0.1:5432/build_db"
 
+# Build Next.js
 RUN npm run build
 
 # Production image
@@ -36,9 +37,12 @@ ENV HOSTNAME=0.0.0.0
 RUN addgroup --system --gid 1001 nodejs \
     && adduser --system --uid 1001 nextjs
 
-# Copy standalone output
+# Copy Next.js standalone output
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
+
+# Copy generated Prisma Client
+COPY --from=builder --chown=nextjs:nodejs /app/generated/prisma ./generated/prisma
 
 # Run as non-root
 USER nextjs
